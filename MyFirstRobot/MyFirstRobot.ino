@@ -12,9 +12,20 @@ int RADAR_DISTANCE_MINIMAL_IN_CM = 50; // centimeter
 int RADAR_DISTANCE_UNKNOWN_IN_CM = 0; // centimeter
 Ultrasonic radarUltrasonic(A5,A4);
 
+
+AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
+AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
+int MOTOR_SPEED = 150;
+int MOTOR_TURN_SPEED = 250;
+int MOTOR_DELAY = 150;
+int MOTOR_TURN_DELAY = 1000;
+int MOTOR_BACKWARD_DELAY = 1000;
+
 struct RobotState {
   int leftMotorDirection;
   int rightMotorDirection;
+  int leftMotorSpeed;
+  int rightMotorSpeed;
   int motorDelay;
 };
 struct RadarDistances {
@@ -23,22 +34,17 @@ struct RadarDistances {
   int right;
 };
 
-AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
-AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
-int motorSpeed = 150;
-int MOTOR_DELAY = 150;
-int MOTOR_TURN_DELAY = 300;
 
 RobotState forwardState = {
-  FORWARD,FORWARD,MOTOR_DELAY};
+  FORWARD,FORWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_DELAY};
 RobotState backwardState = {
-  BACKWARD,BACKWARD,MOTOR_DELAY};
+  BACKWARD,BACKWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY};
 RobotState turnLeftState = {
-  RELEASE,FORWARD,MOTOR_TURN_DELAY};
+  RELEASE,FORWARD,MOTOR_SPEED,MOTOR_TURN_SPEED,MOTOR_TURN_DELAY};
 RobotState turnRightState = {
-  FORWARD,RELEASE,MOTOR_TURN_DELAY};
+  FORWARD,RELEASE,MOTOR_TURN_SPEED,MOTOR_SPEED,MOTOR_TURN_DELAY};
 RobotState stopState = {
-  RELEASE,RELEASE,MOTOR_DELAY};
+  RELEASE,RELEASE,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY};
 RobotState currentState = forwardState;
 
 RadarDistances currentDistances = {
@@ -64,8 +70,8 @@ void initRadar(){
 }
 
 void initMotors(){
-  motorLeft.setSpeed(motorSpeed);     // set the speed to 200/255
-  motorRight.setSpeed(motorSpeed);     // set the speed to 200/255
+  motorLeft.setSpeed(MOTOR_SPEED);     // set the speed to 200/255
+  motorRight.setSpeed(MOTOR_SPEED);     // set the speed to 200/255
 }
 
 void loop() {
@@ -76,8 +82,9 @@ void loop() {
 void calculateRobotState(){
   measureDistanceAhead();
   if(
-  currentDistances.center == RADAR_DISTANCE_UNKNOWN_IN_CM || 
-  currentDistances.center >= RADAR_DISTANCE_MINIMAL_IN_CM){
+    isCenterDistanceUndefinded() || 
+    isNoObstacleInPathAhead())
+  {
     currentState = forwardState;  
     return;
   }
@@ -111,8 +118,15 @@ void go(){
   Serial.print(" , ");
   Serial.print(currentState.rightMotorDirection);
   Serial.println(" }");
+  Serial.print("with : { left:");
+  Serial.print(currentDistances.left);
+  Serial.print(" , center:");
+  Serial.print(currentDistances.center);
+  Serial.print(" , right:");
+  Serial.print(currentDistances.right);
+  Serial.println(" }");
   motor();
-  delay(150);
+  //delay(150);
 }
 
 void motor(){
@@ -144,6 +158,16 @@ int internalMeasure(){
 void moveRadarFastTo(int radarServoPosition){
   radarServo.write(radarServoPosition);              // tell servo to go to position in variable 'pos'
   delay(RADAR_MOVEMENT_DELAY);
+    Serial.print(radarServoPosition==radarServo.read());
+    Serial.println(radarServo.read());
+}
+
+boolean isCenterDistanceUndefinded(){
+  return currentDistances.center == RADAR_DISTANCE_UNKNOWN_IN_CM;
+}
+
+boolean isNoObstacleInPathAhead(){
+  return currentDistances.center >= RADAR_DISTANCE_MINIMAL_IN_CM;
 }
 
 boolean eq(int a, int b){
