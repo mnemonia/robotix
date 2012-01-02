@@ -18,7 +18,8 @@ int currentMoveToDirection = MOVE_STRAIGHT_ABHEAD;
 
 AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
 AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
-int motorSpeed = 200;
+int motorSpeed = 150;
+int MOTOR_TURN_MOVEMENT_DELAY = 500; 
 
 void setup() 
 { 
@@ -46,11 +47,13 @@ void motorBackward(){
 void motorTurnRight(){
   motorRight.run(RELEASE); 
   motorLeft.run(FORWARD); 
+  delay(MOTOR_TURN_MOVEMENT_DELAY);
 }
 
 void motorTurnLeft(){
   motorRight.run(FORWARD); 
   motorLeft.run(RELEASE); 
+  delay(MOTOR_TURN_MOVEMENT_DELAY);
 }
 
 void moveMotors(int moveToDirection){
@@ -82,7 +85,7 @@ void loop()
     Serial.print("Moving to: ");
     Serial.println(moveToDirection);
   //}
-  delay(500);                           // waits for the servo to get there 
+  delay(400);
 } 
 
 void initRadar(){
@@ -107,19 +110,26 @@ int findDirectionToMove(){
 }
 
 void moveRadar(){
+  moveRadarTo(90);
+  delay(RADAR_MOVEMENT_DELAY);
+  RADAR_DISTANCES[1] = measureDistance();
+  if(RADAR_DISTANCES[1]>RADAR_DISTANCE_TO_CHANGE_MOVING_DIRECTION_IN_CM){
+    return;
+  }  
+  
   moveRadarTo(0);
   delay(RADAR_MOVEMENT_DELAY);
   RADAR_DISTANCES[0] = measureDistance();
 
-  moveRadarTo(60);
+  moveRadarTo(90);
   delay(RADAR_MOVEMENT_DELAY);
   RADAR_DISTANCES[1] = measureDistance();
 
-  moveRadarTo(120);
+  moveRadarTo(180);
   delay(RADAR_MOVEMENT_DELAY);
   RADAR_DISTANCES[2] = measureDistance();
 
-  moveRadarTo(60);
+  moveRadarTo(90);
   
   Serial.print("Distances: ");
   Serial.print(RADAR_DISTANCES[0]);  
@@ -131,9 +141,29 @@ void moveRadar(){
 }
 
 void moveRadarTo(int radarServoPosition){
-  radarServo.write(radarServoPosition);
+    moveRadarFastTo(radarServoPosition);
 }
 
+void moveRadarSlowTo(int radarServoPosition){
+  int currentRadarServoPosition = radarServo.read();
+  if(currentRadarServoPosition>radarServoPosition){
+    for(int pos = currentRadarServoPosition; pos>=radarServoPosition; pos-=1)     // goes from 180 degrees to 0 degrees 
+    {                                
+      radarServo.write(pos);              // tell servo to go to position in variable 'pos' 
+      delay(15);                       // waits 15ms for the servo to reach the position 
+    }   
+  }else if(currentRadarServoPosition<radarServoPosition){
+    for(int pos = currentRadarServoPosition; pos <= radarServoPosition; pos += 1)  // goes from 0 degrees to 180 degrees 
+    {                                  // in steps of 1 degree 
+      radarServo.write(pos);              // tell servo to go to position in variable 'pos' 
+      delay(15);                       // waits 15ms for the servo to reach the position 
+    }
+  }
+}
+
+void moveRadarFastTo(int radarServoPosition){
+    radarServo.write(radarServoPosition);              // tell servo to go to position in variable 'pos' 
+}
 
 int measureDistance(){
   return radarUltrasonic.Ranging(CM);
