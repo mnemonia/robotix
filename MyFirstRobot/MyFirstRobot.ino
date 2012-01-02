@@ -7,14 +7,11 @@ typedef enum {
 Servo radarServo;  // create servo object to control a servo 
 int RADAR_INPUT_PIN = 9; 
 int RADAR_MOVEMENT_DELAY = 250; 
-int RADAR_DISTANCE_MINIMAL_IN_CM = 50; // centimeter
+int RADAR_DISTANCE_MINIMAL_IN_CM = 100; // centimeter
 int RADAR_DISTANCE_UNKNOWN_IN_CM = 0; // centimeter
 int RADAR_DISTANCE_UNDEFINED = -1;
 Ultrasonic radarUltrasonic(A5,A4);
-/*
-typedef enum { 
-  MOVE_FORWARD, MOVE_BACKWARD, MOVE_TURN_LEFT, MOVE_TURN_RIGHT, MOVE_BACKWARD_AND_TURN} MoveStrategy; 
-*/
+
 AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
 AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
 int MOTOR_SPEED = 150;// 150;
@@ -70,14 +67,7 @@ void initTrace(){
 
 void initRadar(){
   radarServo.attach(RADAR_INPUT_PIN);  // attaches the servo on pin RADAR_INPUT_PIN to the servo object 
-//  radarServo.write(RADAR_CENTER);
-//  delay(1000);
-    radarServo.write(RADAR_LEFT);
-  delay(1000);
-      radarServo.write(RADAR_RIGHT);
-  delay(1000);
   radarServo.write(RADAR_CENTER);
-  delay(1000);
 }
 
 void initMotors(){
@@ -110,10 +100,6 @@ void calculateRobotState(){
   measureDistanceLeft();
   measureDistanceRight();
 
-/*  lastDistances.left = currentDistances.left;
-  lastDistances.center = currentDistances.center;
-  lastDistances.right = currentDistances.right;
-*/
   if(greater(currentDistances.left,currentDistances.right)){
     currentState = turnLeftState;  
     return;
@@ -131,7 +117,7 @@ void calculateRobotState(){
 }
 
 void go(){
-  /*
+  
   Serial.print("Go : { ");
   Serial.print(currentState.leftMotorDirection);
   Serial.print(" , ");
@@ -144,9 +130,8 @@ void go(){
   Serial.print(" , right:");
   Serial.print(currentDistances.right);
   Serial.println(" }");
-  */
+  
   motor();
-  //delay(150);
 }
 
 void motor(){
@@ -184,9 +169,6 @@ void measureDistanceAhead(){
 int internalMeasure(){
   long microsec = radarUltrasonic.timing();
   return radarUltrasonic.convert(microsec, Ultrasonic::CM);
-  
-//  return radarUltrasonic.Ranging(CM);
-  
 }
 
 void moveRadarFastTo(int radarServoPosition){
