@@ -3,22 +3,24 @@
 #include <Ultrasonic.h>
 
 typedef enum { 
-  RADAR_LEFT = 0, RADAR_CENTER = 90, RADAR_RIGHT = 180 } 
-RadarDirection;
+  RADAR_LEFT = 0, RADAR_CENTER = 60, RADAR_RIGHT = 120 } RadarDirection;
 Servo radarServo;  // create servo object to control a servo 
 int RADAR_INPUT_PIN = 9; 
-int RADAR_MOVEMENT_DELAY = 190; 
+int RADAR_MOVEMENT_DELAY = 250; 
 int RADAR_DISTANCE_MINIMAL_IN_CM = 50; // centimeter
 int RADAR_DISTANCE_UNKNOWN_IN_CM = 0; // centimeter
+int RADAR_DISTANCE_UNDEFINED = -1;
 Ultrasonic radarUltrasonic(A5,A4);
-
-
+/*
+typedef enum { 
+  MOVE_FORWARD, MOVE_BACKWARD, MOVE_TURN_LEFT, MOVE_TURN_RIGHT, MOVE_BACKWARD_AND_TURN} MoveStrategy; 
+*/
 AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
 AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
-int MOTOR_SPEED = 150;
-int MOTOR_TURN_SPEED = 250;
+int MOTOR_SPEED = 150;// 150;
+int MOTOR_TURN_SPEED = 150; //250;
 int MOTOR_DELAY = 150;
-int MOTOR_TURN_DELAY = 1000;
+int MOTOR_TURN_DELAY = 500;
 int MOTOR_BACKWARD_DELAY = 1000;
 
 struct RobotState {
@@ -27,6 +29,7 @@ struct RobotState {
   int leftMotorSpeed;
   int rightMotorSpeed;
   int motorDelay;
+  boolean isBackwardState;
 };
 struct RadarDistances {
   int left;
@@ -36,22 +39,23 @@ struct RadarDistances {
 
 
 RobotState forwardState = {
-  FORWARD,FORWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_DELAY};
+  FORWARD,FORWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_DELAY,false};
 RobotState backwardState = {
-  BACKWARD,BACKWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY};
+  BACKWARD,BACKWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY,true};
+RobotState backwardUturnState = {
+  FORWARD,BACKWARD,MOTOR_SPEED,MOTOR_SPEED,MOTOR_TURN_DELAY,true};
 RobotState turnLeftState = {
-  RELEASE,FORWARD,MOTOR_SPEED,MOTOR_TURN_SPEED,MOTOR_TURN_DELAY};
+  RELEASE,FORWARD,MOTOR_SPEED,MOTOR_TURN_SPEED,MOTOR_TURN_DELAY,false};
 RobotState turnRightState = {
-  FORWARD,RELEASE,MOTOR_TURN_SPEED,MOTOR_SPEED,MOTOR_TURN_DELAY};
+  FORWARD,RELEASE,MOTOR_TURN_SPEED,MOTOR_SPEED,MOTOR_TURN_DELAY,false};
 RobotState stopState = {
-  RELEASE,RELEASE,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY};
+  RELEASE,RELEASE,MOTOR_SPEED,MOTOR_SPEED,MOTOR_BACKWARD_DELAY,false};
 RobotState currentState = forwardState;
 
 RadarDistances currentDistances = {
-  0,0,0};
-/*RadarDistances lastDistances = {
-  0,0,0};
-  */
+  RADAR_DISTANCE_UNDEFINED,RADAR_DISTANCE_UNDEFINED,RADAR_DISTANCE_UNDEFINED};
+RadarDistances lastDistances = {
+  RADAR_DISTANCE_UNDEFINED,RADAR_DISTANCE_UNDEFINED,RADAR_DISTANCE_UNDEFINED};
 
 void setup() {
   initTrace();
@@ -66,7 +70,14 @@ void initTrace(){
 
 void initRadar(){
   radarServo.attach(RADAR_INPUT_PIN);  // attaches the servo on pin RADAR_INPUT_PIN to the servo object 
+//  radarServo.write(RADAR_CENTER);
+//  delay(1000);
+    radarServo.write(RADAR_LEFT);
+  delay(1000);
+      radarServo.write(RADAR_RIGHT);
+  delay(1000);
   radarServo.write(RADAR_CENTER);
+  delay(1000);
 }
 
 void initMotors(){
@@ -76,15 +87,22 @@ void initMotors(){
 
 void loop() {
   calculateRobotState();
+  makeDistancesSnapshot();
   go();
 }
 
 void calculateRobotState(){
   measureDistanceAhead();
+  
   if(
     isCenterDistanceUndefinded() || 
     isNoObstacleInPathAhead())
   {
+//    if(isInCorner()){
+//      currentState = backwardState;  
+//      return;
+//    }
+    
     currentState = forwardState;  
     return;
   }
@@ -96,10 +114,6 @@ void calculateRobotState(){
   lastDistances.center = currentDistances.center;
   lastDistances.right = currentDistances.right;
 */
-  if(eq(currentDistances.left,currentDistances.right)){
-    currentState = backwardState;  
-    return;
-  }
   if(greater(currentDistances.left,currentDistances.right)){
     currentState = turnLeftState;  
     return;
@@ -108,11 +122,16 @@ void calculateRobotState(){
     currentState = turnRightState;  
     return;
   }
+  if(eq(currentDistances.left,currentDistances.right)){
+    currentState = backwardState;  
+    return;
+  }
   
   currentState = stopState;
 }
 
 void go(){
+  /*
   Serial.print("Go : { ");
   Serial.print(currentState.leftMotorDirection);
   Serial.print(" , ");
@@ -125,14 +144,25 @@ void go(){
   Serial.print(" , right:");
   Serial.print(currentDistances.right);
   Serial.println(" }");
+  */
   motor();
   //delay(150);
 }
 
 void motor(){
+  motorLeft.setSpeed(currentState.leftMotorSpeed); 
+  motorRight.setSpeed(currentState.rightMotorSpeed);
   motorLeft.run(currentState.leftMotorDirection); 
   motorRight.run(currentState.rightMotorDirection);
-  delay(currentState.motorDelay);
+  
+  if(currentState.isBackwardState){
+    delay(currentState.motorDelay);
+    motorLeft.setSpeed(backwardUturnState.leftMotorSpeed); 
+    motorRight.setSpeed(backwardUturnState.rightMotorSpeed);
+    motorLeft.run(backwardUturnState.leftMotorDirection); 
+    motorRight.run(backwardUturnState.rightMotorDirection);
+    delay(backwardUturnState.motorDelay);
+  }
 }
 
 
@@ -152,14 +182,16 @@ void measureDistanceAhead(){
 }
 
 int internalMeasure(){
-  return radarUltrasonic.Ranging(CM);
+  long microsec = radarUltrasonic.timing();
+  return radarUltrasonic.convert(microsec, Ultrasonic::CM);
+  
+//  return radarUltrasonic.Ranging(CM);
+  
 }
 
 void moveRadarFastTo(int radarServoPosition){
   radarServo.write(radarServoPosition);              // tell servo to go to position in variable 'pos'
   delay(RADAR_MOVEMENT_DELAY);
-    Serial.print(radarServoPosition==radarServo.read());
-    Serial.println(radarServo.read());
 }
 
 boolean isCenterDistanceUndefinded(){
@@ -170,6 +202,15 @@ boolean isNoObstacleInPathAhead(){
   return currentDistances.center >= RADAR_DISTANCE_MINIMAL_IN_CM;
 }
 
+boolean isInCorner(){
+  boolean left = eq(currentDistances.left,lastDistances.left);
+  boolean center = eq(currentDistances.center,lastDistances.center);
+  boolean right = eq(currentDistances.right,lastDistances.right);
+  return left && center && right;
+}
+
+
+
 boolean eq(int a, int b){
   int epsilon = 5;
   int diff = a - b;
@@ -178,6 +219,16 @@ boolean eq(int a, int b){
 }
 
 boolean greater(int a, int b){
-  return a > b;
+  int epsilon = 5;
+  int diff = a - b;
+  if(diff > 0){
+    diff = diff - epsilon;
+  }
+  return diff > 0;
 }
 
+void makeDistancesSnapshot(){
+  lastDistances.left = currentDistances.left;
+  lastDistances.center = currentDistances.center;
+  lastDistances.right = currentDistances.right;
+}
