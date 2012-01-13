@@ -7,15 +7,15 @@ typedef enum {
 Servo radarServo;  // create servo object to control a servo 
 int RADAR_INPUT_PIN = 9; 
 int RADAR_MOVEMENT_DELAY = 250; 
-int RADAR_DISTANCE_MINIMAL_IN_CM = 100; // centimeter
+int RADAR_DISTANCE_MINIMAL_IN_CM = 80; // centimeter
 int RADAR_DISTANCE_UNKNOWN_IN_CM = 0; // centimeter
 int RADAR_DISTANCE_UNDEFINED = -1;
 Ultrasonic radarUltrasonic(A5,A4);
 
 AF_DCMotor motorLeft(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
 AF_DCMotor motorRight(1, MOTOR12_64KHZ); // create motor #1, 64KHz pwm
-int MOTOR_SPEED = 150;// 150;
-int MOTOR_TURN_SPEED = 150; //250;
+int MOTOR_SPEED = 200;// 150;
+int MOTOR_TURN_SPEED = 200; //250;
 int MOTOR_DELAY = 150;
 int MOTOR_TURN_DELAY = 500;
 int MOTOR_BACKWARD_DELAY = 1000;

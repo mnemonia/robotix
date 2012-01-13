@@ -1,0 +1,27 @@
+
+C Code Generation for CIP MACHINE mDroid in visual ANIMATION Droid of SYSTEM Droid
+	January 6, 2012 10:47:33 am
+
+
+visual ANIMATION specific Errors
+	No visual ANIMATION specific Error
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mDroid terminated
+
+
+Directory for C code files: j:\ws\Robotix\target\anim
+
+generating implementation module for CIP MACHINE aDroid.c ...  complete
+generating header file for CIP MACHINE mDroid.h ...  complete
+generating CIP MACHINE module mDroid.c ...  complete
+generating error header file for CIP MACHINE eDroid.h ...  complete
+generating error module for CIP MACHINE eDroid.c ...  complete
+generating PROCESS module PrimitiveBehavior.c ...  complete
+
+Code generation terminated
