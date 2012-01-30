@@ -1,0 +1,3 @@
+REM Builded dll fuer CIP-System 'Tankstelle'
+cd target\anim
+gcc -Wall -shared *.c -o LampeAnimation.dll
