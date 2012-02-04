@@ -27,6 +27,7 @@
 /* Parameters
 	name_		name value of message */
 
+void uCHAN__LeftDriver (unsigned char name_);
 void uCHAN_LeftDriver (unsigned char name_)
 {
 //    digitalWrite(11,0);
@@ -54,6 +55,7 @@ void uCHAN_LeftDriver (unsigned char name_)
 
 }
 
+void uCHAN__RightDriver (unsigned char name_);
 void uCHAN_RightDriver (unsigned char name_)
 {
 	/* Accessing MESSAGE */
@@ -91,8 +93,9 @@ void iCHAN_(void)
 
 		/* Initializing Output Interface */
 
-	OUT_.LeftDriver = uCHAN_LeftDriver;
-	OUT_.RightDriver = uCHAN_RightDriver;
+	OUT_.LeftDriver = uCHAN__LeftDriver;
+//	OUT_.RightDriver = uCHAN_RightDriver;
+	OUT_.RightDriver = uCHAN__RightDriver;
 }
 
 

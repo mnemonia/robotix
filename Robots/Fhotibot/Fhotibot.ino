@@ -6,32 +6,32 @@ extern "C"{
 #include <Servo.h> 
 #include <DistanceGP2Y0A21YK.h>
 
-DistanceGP2Y0A21YK proxSensor;
+DistanceGP2Y0A21YK proxSensorLeft;
+DistanceGP2Y0A21YK proxSensorRight;
 int distance;
 unsigned char distanceState;
  
 //Servo traceServo;  // create servo object to control a servo 
 //Servo headServo;  // create servo object to control a servo 
 
-const int traceSensorLeftPin = A5; //analog pin 0
-const int traceSensorRightPin = A4; //analog pin 0
+const int proxSensorLeftPin = A5; //analog pin 5
+const int proxSensorRightPin = A4; //analog pin 4
 
-//AF_DCMotor motorLeft(1/*, MOTOR12_64KHZ*/); // create motor #2, 64KHz pwm
-//AF_DCMotor motorRight(2); // create motor #2, 64KHz pwm
-const int motorSpeed = 250;
+AF_DCMotor motorLeft(1/*, MOTOR12_64KHZ*/); // create motor #2, 64KHz pwm
+AF_DCMotor motorRight(2); // create motor #2, 64KHz pwm
+const int motorSpeed = 200;
 
 void setup(){
   Serial.begin(9600);
-  pinMode(10, OUTPUT);      
-  pinMode(11, OUTPUT);      
-  pinMode(12, OUTPUT);      
-  pinMode(13, OUTPUT);      
+
+  motorLeft.setSpeed(motorSpeed);     // set the speed to 200/255
+  motorRight.setSpeed(motorSpeed);     // set the speed to 200/255
+
+  proxSensorLeft.begin(proxSensorLeftPin);
+  proxSensorRight.begin(proxSensorRightPin);
   
-//  motorLeft.setSpeed(motorSpeed);     // set the speed to 200/255
-//  motorRight.setSpeed(motorSpeed);     // set the speed to 200/255
-  proxSensor.begin(A5);
   distanceState = C3_;
-  //traceServo.attach(9);
+//  traceServo.attach(9);
 //  headServo.attach(10);
 
   if(!fINIT_()){
@@ -40,16 +40,14 @@ void setup(){
 
 }
 
-//
-//C3_Clear
-//
-
 void loop(){
-  distance = proxSensor.getDistanceCentimeter();
+  distance = proxSensorLeft.getDistanceCentimeter();
+  int distanceRight = proxSensorRight.getDistanceCentimeter();
+  distance = distance > distanceRight ? distanceRight : distance;
 
-  if(distance>14){
+  if(distance>19){
     radar(C3_Clear);
-  }else if(distance<=14 && distance>6){
+  }else if(distance<=19 && distance>9){
     radar(C3_Attention);
   }else{
     radar(C3_Danger);
@@ -67,69 +65,47 @@ void radar(unsigned char newDistanceState){
   IN_.Radar(newDistanceState);
   TRG_.CHAIN_();
 }
-/*
 
-void rotateHead(){
-  int val = analogRead(traceSensorLeftPin);            // reads the value of the potentiometer (value between 0 and 1023) 
-  val = map(val, 0, 1023, 0, 179);     // scale it to use it with the servo (value between 0 and 180) 
-  headServo.write(val);                  // sets the servo position according to the scaled value 
-  delay(15);                           // waits for the servo to get there 
-}
-void rotateTrace(){
-  int val = analogRead(traceSensorRightPin);            // reads the value of the potentiometer (value between 0 and 1023) 
-  val = map(val, 0, 1023, 0, 179);     // scale it to use it with the servo (value between 0 and 180) 
-  //traceServo.write(val);                  // sets the servo position according to the scaled value 
-  delay(15);                           // waits for the servo to get there 
-}
-
-void forward(){
-  motorLeft.run(FORWARD);      // turn it on going forward
-  motorRight.run(FORWARD);      // turn it on going forward
-}
-void backward(){
-  motorLeft.run(BACKWARD);      // turn it on going forward
-  motorRight.run(BACKWARD);      // turn it on going forward
-}
-void turnShallowLeft(){
-  motorLeft.run(RELEASE);      // turn it on going forward
-  motorRight.run(FORWARD);      // turn it on going forward
-}
-void turnShallowRight(){
-  motorLeft.run(FORWARD);      // turn it on going forward
-  motorRight.run(RELEASE);      // turn it on going forward
-}
-void turnLeft(){
-  motorLeft.run(BACKWARD);      // turn it on going forward
-  motorRight.run(FORWARD);      // turn it on going forward
-}
-void turnRight(){
-  motorLeft.run(FORWARD);      // turn it on going forward
-  motorRight.run(BACKWARD);      // turn it on going forward
-}
-void stopNow(){
-  motorLeft.run(RELEASE);      // turn it on going forward
-  motorRight.run(RELEASE);      // turn it on going forward
+extern "C"
+{
+void uCHAN__LeftDriver (unsigned char name_)
+{
+  switch (name_){
+    case C4_Backward:
+        Serial.println("Left BACKWARD");
+        motorLeft.run(BACKWARD);
+	break;
+    case C4_Forward:
+        Serial.println("Left FORWARD");
+        motorLeft.run(FORWARD);
+        break;
+    case C4_Stop:
+        Serial.println("Left RELEASE");
+        motorLeft.run(RELEASE);
+        break;
+    default: 
+        break;
+  }
 }
 
-void traceAnalog(){
-  int val = analogRead(A0);
-  Serial.print("A0 ");
-  Serial.println(val);
-  val = analogRead(A1);
-  Serial.print("A1 ");
-  Serial.println(val);
-  val = analogRead(A2);
-  Serial.print("A2 ");
-  Serial.println(val);
-  val = analogRead(A3);
-  Serial.print("A3 ");
-  Serial.println(val);
-  val = analogRead(A4);
-  Serial.print("A4 ");
-  Serial.println(val);
-  val = analogRead(A5);
-  Serial.print("A5 ");
-  Serial.println(val);
-    Serial.println("-------");
+void uCHAN__RightDriver (unsigned char name_)
+{
+  switch (name_){
+    case C5_Backward:
+      Serial.println("Right BACKWARD");
+      motorRight.run(BACKWARD);
+      break;
+    case C5_Forward:
+      Serial.println("Right FORWARD");
+      motorRight.run(FORWARD);
+      break;
+    case C5_Stop:
+      Serial.println("Right RELEASE");
+      motorRight.run(RELEASE);
+      break;
+    default: 
+      break;
+  }
 }
-*/
+}
+
