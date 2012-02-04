@@ -4,25 +4,35 @@ extern "C"{
 
 #include <AFMotor.h>
 #include <Servo.h> 
+#include <DistanceGP2Y0A21YK.h>
+
+DistanceGP2Y0A21YK proxSensor;
+int distance;
+unsigned char distanceState;
  
 //Servo traceServo;  // create servo object to control a servo 
-Servo headServo;  // create servo object to control a servo 
+//Servo headServo;  // create servo object to control a servo 
 
 const int traceSensorLeftPin = A5; //analog pin 0
 const int traceSensorRightPin = A4; //analog pin 0
 
-AF_DCMotor motorLeft(1/*, MOTOR12_64KHZ*/); // create motor #2, 64KHz pwm
-AF_DCMotor motorRight(2); // create motor #2, 64KHz pwm
+//AF_DCMotor motorLeft(1/*, MOTOR12_64KHZ*/); // create motor #2, 64KHz pwm
+//AF_DCMotor motorRight(2); // create motor #2, 64KHz pwm
 const int motorSpeed = 250;
 
 void setup(){
   Serial.begin(9600);
-pinMode(13, OUTPUT);      
-  motorLeft.setSpeed(motorSpeed);     // set the speed to 200/255
-  motorRight.setSpeed(motorSpeed);     // set the speed to 200/255
+  pinMode(10, OUTPUT);      
+  pinMode(11, OUTPUT);      
+  pinMode(12, OUTPUT);      
+  pinMode(13, OUTPUT);      
   
+//  motorLeft.setSpeed(motorSpeed);     // set the speed to 200/255
+//  motorRight.setSpeed(motorSpeed);     // set the speed to 200/255
+  proxSensor.begin(A5);
+  distanceState = C3_;
   //traceServo.attach(9);
-  headServo.attach(10);
+//  headServo.attach(10);
 
   if(!fINIT_()){
   // Fehler in fININT ...
@@ -35,19 +45,29 @@ pinMode(13, OUTPUT);
 //
 
 void loop(){
-  
-//  int in = digitalRead(12); 
-  
-  Serial.println(C3_Clear);
-  IN_.Radar(C3_Clear);
-  TRG_.CHAIN_();
-  delay(1000);
-  Serial.println(C3_Attention);
-  IN_.Radar(C3_Attention);
-  TRG_.CHAIN_();
-  delay(1000);
+  distance = proxSensor.getDistanceCentimeter();
 
+  if(distance>14){
+    radar(C3_Clear);
+  }else if(distance<=14 && distance>6){
+    radar(C3_Attention);
+  }else{
+    radar(C3_Danger);
+  }
+  delay(20);
 }
+
+void radar(unsigned char newDistanceState){
+  if(distanceState==newDistanceState){
+      return;
+  }
+  
+  distanceState = newDistanceState;
+  Serial.println(newDistanceState);
+  IN_.Radar(newDistanceState);
+  TRG_.CHAIN_();
+}
+/*
 
 void rotateHead(){
   int val = analogRead(traceSensorLeftPin);            // reads the value of the potentiometer (value between 0 and 1023) 
@@ -112,3 +132,4 @@ void traceAnalog(){
   Serial.println(val);
     Serial.println("-------");
 }
+*/
