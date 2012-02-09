@@ -1,6 +1,6 @@
 
-C Code Generation for CIP SHELL sTheUnit in IMPLEMENTATION Arduino of SYSTEM Fhotibot
-	February 4, 2012 10:35:34 pm
+C Code Generation for CIP SHELL sTheUnit in IMPLEMENTATION Arduino of SYSTEM BabyAlarm
+	February 9, 2012 2:08:33 am
 
 
 Errors
@@ -11,11 +11,4 @@ Warnings
 
 Verification of CIP SHELL sTheUnit terminated
 
-
-Directory for C code files: c:\Programme\CipTool\CIP_441
-
-generating CIP Connector Template Module for CIP SHELL _conTheUnit.tpl ...  complete
-generating shell headerfile for CIP SHELL sTheUnit.h ...  complete
-generating CIP SHELL module sTheUnit.c ...  complete
-
-Code generation terminated
+Code generation aborted ! !
