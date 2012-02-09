@@ -15,6 +15,7 @@ int currentTimeInMillies;
 
 void setup(){
   Serial.begin(9600);
+  pinMode(11,INPUT);
   pinMode(12,OUTPUT);
   pinMode(13,OUTPUT);
   /*********************************************************************
@@ -34,32 +35,38 @@ void setup(){
 }
 void loop(){
   if(currentNoise() > maxAllowedNoise()){
-    Serial.println("A");
+    Serial.println("Loud");
     IN_.Surveillance(C1_Loud);
   }
   else{
-    Serial.println("B");
+    Serial.println("Silent");
     IN_.Surveillance(C1_Silent);
+  }
+  
+  if(isRecordButtonPressed()){
+    IN_.Record(C3_Recording); 
+  }else{
+    IN_.Record(C3_Done);    
   }
   delay(2000);
 }
 
 long currentNoise(){
-  long noise = senseSound();
+  long noise = map(senseSound(),24000,50000,0,100);
   Serial.print("Noise: ");
   Serial.println(noise);
   return noise;
 }
 
+long senseSound(){
+  return average(A0);  
+}
+
 long maxAllowedNoise(){
-  long treshold = senseThreshold();
+  long treshold = map(senseThreshold(),0,1023,0,100);
   Serial.print("Treshold: ");
   Serial.println(treshold);
   return treshold;
-}
-
-long senseSound(){
-  return average(A0);  
 }
 
 long senseThreshold(){
@@ -75,6 +82,10 @@ long average(int pin){
     sumOfSquaresA += signalA;
   }
   return sumOfSquaresA / numberOfSamples; 
+}
+
+boolean isRecordButtonPressed(){
+  return digitalRead(11) > 0;  
 }
 
 
