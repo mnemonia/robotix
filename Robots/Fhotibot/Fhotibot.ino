@@ -30,7 +30,7 @@ void setup(){
   proxSensorLeft.begin(proxSensorLeftPin);
   proxSensorRight.begin(proxSensorRightPin);
   
-  distanceState = C3_;
+  distanceState = C8_Clear;
 //  traceServo.attach(9);
 //  headServo.attach(10);
 
@@ -46,66 +46,120 @@ void loop(){
   distance = distance > distanceRight ? distanceRight : distance;
 
   if(distance>19){
-    radar(C3_Clear);
+    radar(C8_Clear);
   }else if(distance<=19 && distance>9){
-    radar(C3_Attention);
+    radar(C8_Attention);
   }else{
-    radar(C3_Danger);
+    radar(C8_Danger);
   }
   delay(20);
 }
 
-void radar(unsigned char newDistanceState){
-  if(distanceState==newDistanceState){
+void radar(unsigned char name_AutonomousDriveEvent){
+  if(distanceState==name_AutonomousDriveEvent){
       return;
   }
   
-  distanceState = newDistanceState;
-  Serial.println(newDistanceState);
-  IN_.Radar(newDistanceState);
-  TRG_.CHAIN_();
+  distanceState = name_AutonomousDriveEvent;
+  Serial.println(name_AutonomousDriveEvent);
+  
+  //uCHAN_AutonomousDriveEvents(name_AutonomousDriveEvent);
+    IN_.AutonomousDriveEvents(name_AutonomousDriveEvent);
+  TRG_.CHAIN_();  
 }
 
 extern "C"
 {
-void uCHAN__LeftDriver (unsigned char name_)
+
+/*********************************************************************
+	User defined Output Channel Functions
+*********************************************************************/
+
+/* Output Channel Functions,
+	called by CIP Machine when a Message is written.
+	User defined function, with name to consider as suggestion */
+
+/* Parameters
+	name_		name value of message */
+
+void uCHAN_AutonomousDriveEvents (unsigned char name_)
 {
-  switch (name_){
-    case C4_Backward:
-        Serial.println("Left BACKWARD");
-        motorLeft.run(BACKWARD);
-	break;
-    case C4_Forward:
-        Serial.println("Left FORWARD");
-        motorLeft.run(FORWARD);
-        break;
-    case C4_Stop:
-        Serial.println("Left RELEASE");
-        motorLeft.run(RELEASE);
-        break;
-    default: 
-        break;
-  }
+  IN_.AutonomousDriveEvents(name_);
+  TRG_.CHAIN_();  
 }
 
-void uCHAN__RightDriver (unsigned char name_)
+void uCHAN_ObstacleEvents (unsigned char name_)
 {
-  switch (name_){
-    case C5_Backward:
-      Serial.println("Right BACKWARD");
-      motorRight.run(BACKWARD);
-      break;
-    case C5_Forward:
-      Serial.println("Right FORWARD");
-      motorRight.run(FORWARD);
-      break;
-    case C5_Stop:
-      Serial.println("Right RELEASE");
-      motorRight.run(RELEASE);
-      break;
-    default: 
-      break;
-  }
+  IN_.ObstacleEvents(name_);
+  TRG_.CHAIN_();  
 }
+
+void uCHAN_RemoteControlEvents (unsigned char name_)
+{
+  IN_.RemoteControlEvents(name_);
+  TRG_.CHAIN_();  
+}
+
+void uCHAN_LeftMotor (unsigned char name_)
+{
+ 	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C4_Backward:
+          Serial.println("Left BACKWARD");
+          motorLeft.run(BACKWARD);
+  	  break;
+	case C4_Forward:
+          Serial.println("Left FORWARD");
+          motorLeft.run(FORWARD);
+          break;
+	case C4_Stop:
+          Serial.println("Left RELEASE");
+          motorLeft.run(RELEASE);
+          break;
+	default: 
+		break;
+	}
+}
+
+void uCHAN_RightMotor (unsigned char name_)
+{
+  	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C5_Backward:
+          Serial.println("Right BACKWARD");
+          motorRight.run(BACKWARD);
+          break;
+	case C5_Forward:
+          Serial.println("Right FORWARD");
+          motorRight.run(FORWARD);
+          break;
+	case C5_Stop:
+          Serial.println("Right RELEASE");
+          motorRight.run(RELEASE);
+          break;
+	default: 
+		break;
+	}
+}
+
+void iCHAN_(void)
+{
+		/* Initializing Input Error Function only if Input Error Option set */
+
+	#ifdef _EINPUT__
+		IN_.EINPUT_ = uEINPUT_;
+	#endif 
+
+		/* Initializing Output Interface */
+
+	OUT_.AutonomousDriveEvents = uCHAN_AutonomousDriveEvents;
+	OUT_.LeftMotor = uCHAN_LeftMotor;
+	OUT_.ObstacleEvents = uCHAN_ObstacleEvents;
+	OUT_.RemoteControlEvents = uCHAN_RemoteControlEvents;
+	OUT_.RightMotor = uCHAN_RightMotor;
+}
+
 }
 
