@@ -33,6 +33,7 @@ uint16_t pulses[100][2];  // pair is high and low pulse
 uint8_t currentpulse = 0; // index for pulses we're storing
 
 #include "ircodes.h"
+#include "ircodesSilverlitPico2006.h"
 
 
 void setup(void) {
@@ -60,6 +61,25 @@ void loop(void) {
     if (IRcompare(numberpulses, IRsignal_Key5)) {
     Serial.println("STOP");
   }
+
+
+  if (IRcompare(numberpulses, IRsignal_LEFT_ChannelA)) {
+    Serial.println("LEFT");
+  }
+
+  if (IRcompare(numberpulses, IRsignal_RIGHT_ChannelA)) {
+    Serial.println("RIGHT");
+  }
+  /*
+  if (IRcompare(numberpulses, IRsignal_FORWARD_FULL_ChannelA)) {
+    Serial.println("FORWARD");
+  }
+  */
+    if (IRcompare(numberpulses, IRsignal_STOP_ChannelA)) {
+    Serial.println("STOP");
+  }
+
+
 
 }
 
