@@ -1,0 +1,35 @@
+
+
+Verification of IMPLEMENTATION Arduino of SYSTEM Fhotibot2
+	February 20, 2012 9:06:38 pm
+
+CIP UNIT TheUnit
+
+CIP SHELL sTheUnit
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sTheUnit terminated
+
+
+CIP MACHINE mTheUnit
+
+Errors
+	No Error
+
+Warnings
+
+	Warning for PROCESS Drive
+		untranslated INPULSE -> BWD; 
+
+Verification of CIP MACHINE mTheUnit terminated
+
+
+Verification of CIP UNIT TheUnit terminated
+
+
+Verification of IMPLEMENTATION Arduino terminated
