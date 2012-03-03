@@ -90,7 +90,7 @@ boolean bumper(){
       IN_.BumperInfo(C4_HITTED);
       return true;
     case LOW:
-      IN_.BumperInfo(C4_RELEASED);
+      //IN_.BumperInfo(C4_RELEASED);
       return false;
   }
   return false;
@@ -129,6 +129,7 @@ boolean finder(){
 
 void incrementTime(){
   TRG_.TICK_();		/* increment CIP Machine time by one Tick */
+  if (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
   Serial.println("TICK");
 }
 
