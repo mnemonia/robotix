@@ -1,7 +1,7 @@
 
 
 Verification of IMPLEMENTATION Arduino of SYSTEM Fhotibot2
-	February 20, 2012 9:06:38 pm
+	March 3, 2012 9:56:15 pm
 
 CIP UNIT TheUnit
 
@@ -23,8 +23,8 @@ Errors
 
 Warnings
 
-	Warning for PROCESS Drive
-		untranslated INPULSE -> BWD; 
+	Warning for PROCESS Bump
+		undefined OPERATION -> HitDelay; 
 
 Verification of CIP MACHINE mTheUnit terminated
 

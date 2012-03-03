@@ -1,15 +1,13 @@
 
 C Code Generation for CIP MACHINE mTheUnit in IMPLEMENTATION Arduino of SYSTEM Fhotibot2
-	February 20, 2012 9:08:37 pm
+	March 3, 2012 9:58:34 pm
 
 
 Errors
 	No Error
 
 Warnings
-
-	Warning for PROCESS Drive
-		untranslated INPULSE -> BWD; 
+	No Warning
 
 Verification of CIP MACHINE mTheUnit terminated
 
@@ -22,7 +20,9 @@ generating header file for CIP MACHINE mTheUnit.h ...  complete
 generating CIP MACHINE module mTheUnit.c ...  complete
 generating error header file for CIP MACHINE eTheUnit.h ...  complete
 generating error module for CIP MACHINE eTheUnit.c ...  complete
+generating PROCESS module Bump.c ...  complete
 generating PROCESS module Drive.c ...  complete
+generating PROCESS module ObjectAvoidance.c ...  complete
 generating PROCESS module Target.c ...  complete
 generating trace header file for CIP MACHINE tTheUnit.h ...  complete
 generating trace module for CIP MACHINE tTheUnit.c ...  complete

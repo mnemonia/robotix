@@ -16,6 +16,7 @@
 // http://arduino.cc/en/Hacking/PinMapping168 for the 'raw' pin mapping
 #define IRpin_PIN      PIND
 #define IRpin          2
+#define BUMPER_PIN     8
 
 // the maximum pulse 65000 we'll listen for - 65 milliseconds is a long time
 #define MAXPULSE 4178
@@ -38,17 +39,26 @@ extern "C"{
 #include "ircodesSilverlitPicooZ2006.h"
 #include <AFMotor.h>
 
-AF_DCMotor motorLeft(1);
-AF_DCMotor motorRight(2);
+//AF_DCMotor motorLeft(1);
+//AF_DCMotor motorRight(2);
 
 int theSpeed = 200;
 unsigned char lastEvent = C1_;
+int currentMillies = 0;
+
+const int ledPin =  12;      // the number of the LED pin
 
 void setup(void) {
   Serial.begin(9600);
   Serial.println("Ready to decode IR!");
-  motorLeft.setSpeed(theSpeed);     // set the speed to 200/255
-  motorRight.setSpeed(theSpeed);     // set the speed to 200/255
+//  motorLeft.setSpeed(theSpeed);     // set the speed to 200/255
+//  motorRight.setSpeed(theSpeed);     // set the speed to 200/255
+
+  pinMode(BUMPER_PIN, INPUT);     
+  pinMode(9, OUTPUT);     
+  pinMode(10, OUTPUT);     
+  pinMode(11, OUTPUT);     
+  pinMode(12, OUTPUT);     
 
   if (fINIT_())
   {
@@ -62,14 +72,37 @@ void setup(void) {
 }
 
 void loop(void) {
-  int numberpulses;
-  
-  numberpulses = listenForIR();
+  if(!bumper()){
+    //if(!avoider()){
+      if(!finder()){
+      
+      }
+    //}
+  }
+
+  incrementTime();
+}
+
+boolean bumper(){
+  switch(digitalRead(BUMPER_PIN)){
+    case HIGH:
+      Serial.println("BUMPER HIT");
+      IN_.BumperInfo(C4_HITTED);
+      return true;
+    case LOW:
+      IN_.BumperInfo(C4_RELEASED);
+      return false;
+  }
+  return false;
+}
+
+boolean finder(){
+  int numberpulses = listenForIR();
   
   Serial.print("Heard ");
   Serial.print(numberpulses);
   Serial.println("-pulse long IR signal");
-  if(numberpulses<21){return;}
+  if(numberpulses<21){return false;}
 
   if (IRcompare(numberpulses, IRsignal_LEFT_ChannelA)) {
     Serial.println("LEFT");
@@ -90,6 +123,20 @@ void loop(void) {
     Serial.println("STOP");
     notify(C1_Unknown);
   }
+  
+  return true;
+}
+
+void incrementTime(){
+  TRG_.TICK_();		/* increment CIP Machine time by one Tick */
+  Serial.println("TICK");
+}
+
+void on(int pin){
+  digitalWrite(pin, HIGH);   // set the LED on
+}
+void off(int pin){
+  digitalWrite(pin, LOW);   // set the LED off
 }
 
 void notify(unsigned char event){
@@ -97,25 +144,34 @@ void notify(unsigned char event){
     return;
   }
   
-  IN_.Position(event);
+  IN_.PositionInfo(event);
   lastEvent = event;
 }
 
 extern "C" {
 
+ 
+void allOff(){
+  off(11);
+  off(12);
+}
+
 void uCHAN_MotorLeftActions (unsigned char name_)
 {
+  allOff();
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
 	case C2_BWD:
-		motorLeft.run(BACKWARD); 
+                on(12);
+//		motorLeft.run(BACKWARD); 
 		break;
 	case C2_FWD:
-		motorLeft.run(FORWARD); 
+                on(11);
+//		motorLeft.run(FORWARD); 
 		break;
 	case C2_STOP:
-		motorLeft.run(RELEASE); 
+//		motorLeft.run(RELEASE); 
 		break;
 	default: 
 		break;
@@ -128,13 +184,13 @@ void uCHAN_MotorRightActions (unsigned char name_)
 	switch (name_)
 	{
 	case C3_BWD:
-		motorRight.run(BACKWARD); 
+//		motorRight.run(BACKWARD); 
 		break;
 	case C3_FWD:
-		motorRight.run(FORWARD); 
+//		motorRight.run(FORWARD); 
 		break;
 	case C3_STOP:
-		motorRight.run(RELEASE); 
+//		motorRight.run(RELEASE); 
 		break;
 	default: 
 		break;
@@ -154,7 +210,8 @@ void iCHAN_(void)
 	OUT_.MotorLeftActions = uCHAN_MotorLeftActions;
 	OUT_.MotorRightActions = uCHAN_MotorRightActions;
 }
-}
+
+} // extern C
 
 boolean IRcompare(int numpulses, int Signal[]) {
   
