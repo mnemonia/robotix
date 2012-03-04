@@ -18,6 +18,15 @@
 #define IRpin          2
 #define BUMPER_PIN     8
 
+
+#define MOTOR_SIMULATION_LEFT_FWD 6
+#define MOTOR_SIMULATION_LEFT_STOP 5
+#define MOTOR_SIMULATION_LEFT_BWD 7
+
+#define MOTOR_SIMULATION_RIGHT_FWD 11
+#define MOTOR_SIMULATION_RIGHT_STOP 10
+#define MOTOR_SIMULATION_RIGHT_BWD 12
+
 // the maximum pulse 65000 we'll listen for - 65 milliseconds is a long time
 #define MAXPULSE 4178
 
@@ -39,6 +48,9 @@ extern "C"{
 #include "ircodesSilverlitPicooZ2006.h"
 #include <AFMotor.h>
 
+#include <Ultrasonic.h>
+Ultrasonic ultrasonic(A5,A4);
+
 //AF_DCMotor motorLeft(1);
 //AF_DCMotor motorRight(2);
 
@@ -55,10 +67,12 @@ void setup(void) {
 //  motorRight.setSpeed(theSpeed);     // set the speed to 200/255
 
   pinMode(BUMPER_PIN, INPUT);     
-  pinMode(9, OUTPUT);     
-  pinMode(10, OUTPUT);     
-  pinMode(11, OUTPUT);     
-  pinMode(12, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_LEFT_FWD, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_LEFT_STOP, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_LEFT_BWD, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_RIGHT_FWD, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_RIGHT_STOP, OUTPUT);     
+  pinMode(MOTOR_SIMULATION_RIGHT_BWD, OUTPUT);     
 
   if (fINIT_())
   {
@@ -73,11 +87,11 @@ void setup(void) {
 
 void loop(void) {
   if(!bumper()){
-    //if(!avoider()){
+    if(!avoider()){
       if(!finder()){
       
       }
-    //}
+    }
   }
 
   incrementTime();
@@ -93,6 +107,14 @@ boolean bumper(){
       //IN_.BumperInfo(C4_RELEASED);
       return false;
   }
+  return false;
+}
+
+boolean avoider(){
+  long microsec = ultrasonic.timing();
+  float cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  Serial.print(cmMsec);
+  Serial.println("cm");
   return false;
 }
 
@@ -152,26 +174,33 @@ void notify(unsigned char event){
 extern "C" {
 
  
-void allOff(){
-  off(11);
-  off(12);
+void allLeftOff(){
+  off(MOTOR_SIMULATION_LEFT_FWD);
+  off(MOTOR_SIMULATION_LEFT_STOP);
+  off(MOTOR_SIMULATION_LEFT_BWD);
+}
+void allRightOff(){
+  off(MOTOR_SIMULATION_RIGHT_FWD);
+  off(MOTOR_SIMULATION_RIGHT_STOP);
+  off(MOTOR_SIMULATION_RIGHT_BWD);
 }
 
 void uCHAN_MotorLeftActions (unsigned char name_)
 {
-  allOff();
+  allLeftOff();
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
 	case C2_BWD:
-                on(12);
+                on(MOTOR_SIMULATION_LEFT_BWD);
 //		motorLeft.run(BACKWARD); 
 		break;
 	case C2_FWD:
-                on(11);
+                on(MOTOR_SIMULATION_LEFT_FWD);
 //		motorLeft.run(FORWARD); 
 		break;
 	case C2_STOP:
+                on(MOTOR_SIMULATION_LEFT_STOP);
 //		motorLeft.run(RELEASE); 
 		break;
 	default: 
@@ -181,16 +210,20 @@ void uCHAN_MotorLeftActions (unsigned char name_)
 
 void uCHAN_MotorRightActions (unsigned char name_)
 {
+  allRightOff();
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
 	case C3_BWD:
+          on(MOTOR_SIMULATION_RIGHT_BWD);
 //		motorRight.run(BACKWARD); 
 		break;
 	case C3_FWD:
+          on(MOTOR_SIMULATION_RIGHT_FWD);
 //		motorRight.run(FORWARD); 
 		break;
 	case C3_STOP:
+          on(MOTOR_SIMULATION_RIGHT_STOP);
 //		motorRight.run(RELEASE); 
 		break;
 	default: 
