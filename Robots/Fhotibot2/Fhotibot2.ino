@@ -49,7 +49,10 @@ extern "C"{
 #include <AFMotor.h>
 
 #include <Ultrasonic.h>
-Ultrasonic ultrasonic(A5,A4);
+#define TRIGGER_PIN  4
+#define ECHO_PIN     13
+
+Ultrasonic ultrasonic(TRIGGER_PIN,ECHO_PIN);
 
 //AF_DCMotor motorLeft(1);
 //AF_DCMotor motorRight(2);
@@ -73,6 +76,9 @@ void setup(void) {
   pinMode(MOTOR_SIMULATION_RIGHT_FWD, OUTPUT);     
   pinMode(MOTOR_SIMULATION_RIGHT_STOP, OUTPUT);     
   pinMode(MOTOR_SIMULATION_RIGHT_BWD, OUTPUT);     
+  
+  pinMode(TRIGGER_PIN, OUTPUT);     
+  pinMode(ECHO_PIN, INPUT);     
 
   if (fINIT_())
   {
@@ -88,9 +94,9 @@ void setup(void) {
 void loop(void) {
   if(!bumper()){
     if(!avoider()){
-      if(!finder()){
+      //if(!finder()){
       
-      }
+      //}
     }
   }
 
@@ -111,11 +117,25 @@ boolean bumper(){
 }
 
 boolean avoider(){
+  float cmMsec;
   long microsec = ultrasonic.timing();
-  float cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  /*
+  Serial.print("MS: ");
+  Serial.print(microsec);
+  Serial.print(", CM: ");
   Serial.print(cmMsec);
-  Serial.println("cm");
-  return false;
+  */
+  if(cmMsec > 0 && cmMsec < 20){
+    IN_.ObjectAvoidanceInfo(C5_DANGER);
+  }else if(cmMsec >= 20 && cmMsec < 50){
+    IN_.ObjectAvoidanceInfo(C5_ATTENTION);
+  }else{
+    IN_.ObjectAvoidanceInfo(C5_CLEAR);
+    return false;
+  }
+  
+  return true;
 }
 
 boolean finder(){
