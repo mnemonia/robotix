@@ -43,7 +43,7 @@ uint16_t pulses[100][2];  // pair is high and low pulse
 uint8_t currentpulse = 0; // index for pulses we're storing
 
 extern "C"{
-  #include "sTheUnit.h"
+#include "sTheUnit.h"
 }
 #include "ircodesSilverlitPicooZ2006.h"
 #include <AFMotor.h>
@@ -63,11 +63,13 @@ int currentMillies = 0;
 
 const int ledPin =  12;      // the number of the LED pin
 
+int currentTargetDirectionMemento = C1_;
+
 void setup(void) {
   Serial.begin(9600);
   Serial.println("Ready to decode IR!");
-//  motorLeft.setSpeed(theSpeed);     // set the speed to 200/255
-//  motorRight.setSpeed(theSpeed);     // set the speed to 200/255
+  //  motorLeft.setSpeed(theSpeed);     // set the speed to 200/255
+  //  motorRight.setSpeed(theSpeed);     // set the speed to 200/255
 
   pinMode(BUMPER_PIN, INPUT);     
   pinMode(MOTOR_SIMULATION_LEFT_FWD, OUTPUT);     
@@ -76,27 +78,27 @@ void setup(void) {
   pinMode(MOTOR_SIMULATION_RIGHT_FWD, OUTPUT);     
   pinMode(MOTOR_SIMULATION_RIGHT_STOP, OUTPUT);     
   pinMode(MOTOR_SIMULATION_RIGHT_BWD, OUTPUT);     
-  
+
   pinMode(TRIGGER_PIN, OUTPUT);     
   pinMode(ECHO_PIN, INPUT);     
 
   if (fINIT_())
   {
-  	/* activation of drive loop */
+    /* activation of drive loop */
   }
   else 
   {
-  	/* initialization failed, abort drive */
+    /* initialization failed, abort drive */
   }
-  
+
 }
 
 void loop(void) {
   if(!bumper()){
     if(!avoider()){
-      //if(!finder()){
-      
-      //}
+      if(!finder()){
+
+      }
     }
   }
 
@@ -105,13 +107,13 @@ void loop(void) {
 
 boolean bumper(){
   switch(digitalRead(BUMPER_PIN)){
-    case HIGH:
-      Serial.println("BUMPER HIT");
-      IN_.BumperInfo(C4_HITTED);
-      return true;
-    case LOW:
-      //IN_.BumperInfo(C4_RELEASED);
-      return false;
+  case HIGH:
+    Serial.println("BUMPER HIT");
+    IN_.BumperInfo(C4_HITTED);
+    return true;
+  case LOW:
+    //IN_.BumperInfo(C4_RELEASED);
+    return false;
   }
   return false;
 }
@@ -122,29 +124,59 @@ boolean avoider(){
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
   /*
   Serial.print("MS: ");
-  Serial.print(microsec);
-  Serial.print(", CM: ");
-  Serial.print(cmMsec);
-  */
+   Serial.print(microsec);
+   Serial.print(", CM: ");
+   Serial.print(cmMsec);
+   */
   if(cmMsec > 0 && cmMsec < 20){
     IN_.ObjectAvoidanceInfo(C5_DANGER);
-  }else if(cmMsec >= 20 && cmMsec < 50){
+  }
+  else if(cmMsec >= 20 && cmMsec < 50){
     IN_.ObjectAvoidanceInfo(C5_ATTENTION);
-  }else{
+  }
+  else{
     IN_.ObjectAvoidanceInfo(C5_CLEAR);
     return false;
   }
-  
+
   return true;
 }
 
 boolean finder(){
-  int numberpulses = listenForIR();
+  int targetDirection = selectTargetDirection(
+                          analogRead(A0), 
+                          analogRead(A1));
+  if(targetDirection == currentTargetDirectionMemento){
+    return false;
+  }
+
+  IN_.PositionInfo(targetDirection);
   
+  currentTargetDirectionMemento = targetDirection;
+  return true;
+}
+
+int selectTargetDirection(int valLeft, int valRight){
+  if(eq(valLeft,valRight)){
+    return C1_Ahead;
+  }
+  
+  if(valLeft > valRight){
+    return C1_Left;
+  }
+
+  return C1_Right;
+}
+
+boolean targetFinder(){
+  int numberpulses = listenForIR();
+
   Serial.print("Heard ");
   Serial.print(numberpulses);
   Serial.println("-pulse long IR signal");
-  if(numberpulses<21){return false;}
+  if(numberpulses<21){
+    return false;
+  }
 
   if (IRcompare(numberpulses, IRsignal_LEFT_ChannelA)) {
     Serial.println("LEFT");
@@ -165,12 +197,12 @@ boolean finder(){
     Serial.println("STOP");
     notify(C1_Unknown);
   }
-  
+
   return true;
 }
 
 void incrementTime(){
-  TRG_.TICK_();		/* increment CIP Machine time by one Tick */
+  TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
   if (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
   Serial.println("TICK");
 }
@@ -186,123 +218,125 @@ void notify(unsigned char event){
   if(lastEvent == event){
     return;
   }
-  
+
   IN_.PositionInfo(event);
   lastEvent = event;
 }
 
 extern "C" {
 
- 
-void allLeftOff(){
-  off(MOTOR_SIMULATION_LEFT_FWD);
-  off(MOTOR_SIMULATION_LEFT_STOP);
-  off(MOTOR_SIMULATION_LEFT_BWD);
-}
-void allRightOff(){
-  off(MOTOR_SIMULATION_RIGHT_FWD);
-  off(MOTOR_SIMULATION_RIGHT_STOP);
-  off(MOTOR_SIMULATION_RIGHT_BWD);
-}
 
-void uCHAN_MotorLeftActions (unsigned char name_)
-{
-  allLeftOff();
-	/* Accessing MESSAGE */
-	switch (name_)
-	{
-	case C2_BWD:
-                on(MOTOR_SIMULATION_LEFT_BWD);
-//		motorLeft.run(BACKWARD); 
-		break;
-	case C2_FWD:
-                on(MOTOR_SIMULATION_LEFT_FWD);
-//		motorLeft.run(FORWARD); 
-		break;
-	case C2_STOP:
-                on(MOTOR_SIMULATION_LEFT_STOP);
-//		motorLeft.run(RELEASE); 
-		break;
-	default: 
-		break;
-	}
-}
+  void allLeftOff(){
+    off(MOTOR_SIMULATION_LEFT_FWD);
+    off(MOTOR_SIMULATION_LEFT_STOP);
+    off(MOTOR_SIMULATION_LEFT_BWD);
+  }
+  void allRightOff(){
+    off(MOTOR_SIMULATION_RIGHT_FWD);
+    off(MOTOR_SIMULATION_RIGHT_STOP);
+    off(MOTOR_SIMULATION_RIGHT_BWD);
+  }
 
-void uCHAN_MotorRightActions (unsigned char name_)
-{
-  allRightOff();
-	/* Accessing MESSAGE */
-	switch (name_)
-	{
-	case C3_BWD:
-          on(MOTOR_SIMULATION_RIGHT_BWD);
-//		motorRight.run(BACKWARD); 
-		break;
-	case C3_FWD:
-          on(MOTOR_SIMULATION_RIGHT_FWD);
-//		motorRight.run(FORWARD); 
-		break;
-	case C3_STOP:
-          on(MOTOR_SIMULATION_RIGHT_STOP);
-//		motorRight.run(RELEASE); 
-		break;
-	default: 
-		break;
-	}
-}
+  void uCHAN_MotorLeftActions (unsigned char name_)
+  {
+    allLeftOff();
+    /* Accessing MESSAGE */
+    switch (name_)
+    {
+    case C2_BWD:
+      on(MOTOR_SIMULATION_LEFT_BWD);
+      //		motorLeft.run(BACKWARD); 
+      break;
+    case C2_FWD:
+      on(MOTOR_SIMULATION_LEFT_FWD);
+      //		motorLeft.run(FORWARD); 
+      break;
+    case C2_STOP:
+      on(MOTOR_SIMULATION_LEFT_STOP);
+      //		motorLeft.run(RELEASE); 
+      break;
+    default: 
+      break;
+    }
+  }
 
-void iCHAN_(void)
-{
-		/* Initializing Input Error Function only if Input Error Option set */
+  void uCHAN_MotorRightActions (unsigned char name_)
+  {
+    allRightOff();
+    /* Accessing MESSAGE */
+    switch (name_)
+    {
+    case C3_BWD:
+      on(MOTOR_SIMULATION_RIGHT_BWD);
+      //		motorRight.run(BACKWARD); 
+      break;
+    case C3_FWD:
+      on(MOTOR_SIMULATION_RIGHT_FWD);
+      //		motorRight.run(FORWARD); 
+      break;
+    case C3_STOP:
+      on(MOTOR_SIMULATION_RIGHT_STOP);
+      //		motorRight.run(RELEASE); 
+      break;
+    default: 
+      break;
+    }
+  }
 
-	#ifdef _EINPUT__
-		IN_.EINPUT_ = uEINPUT_;
-	#endif 
+  void iCHAN_(void)
+  {
+    /* Initializing Input Error Function only if Input Error Option set */
 
-		/* Initializing Output Interface */
+#ifdef _EINPUT__
+    IN_.EINPUT_ = uEINPUT_;
+#endif 
 
-	OUT_.MotorLeftActions = uCHAN_MotorLeftActions;
-	OUT_.MotorRightActions = uCHAN_MotorRightActions;
-}
+    /* Initializing Output Interface */
+
+    OUT_.MotorLeftActions = uCHAN_MotorLeftActions;
+    OUT_.MotorRightActions = uCHAN_MotorRightActions;
+  }
 
 } // extern C
 
 boolean IRcompare(int numpulses, int Signal[]) {
-  
+
   for (int i=0; i< numpulses-1; i++) {
     int oncode = pulses[i][1] * RESOLUTION / 10;
     int offcode = pulses[i+1][0] * RESOLUTION / 10;
-    
+
     /*
     Serial.print(oncode); // the ON signal we heard
-    Serial.print(" - ");
-    Serial.print(Signal[i*2 + 0]); // the ON signal we want 
-    */
-    
+     Serial.print(" - ");
+     Serial.print(Signal[i*2 + 0]); // the ON signal we want 
+     */
+
     // check to make sure the error is less than FUZZINESS percent
     if ( abs(oncode - Signal[i*2 + 0]) <= (Signal[i*2 + 0] * FUZZINESS / 100)) {
       //Serial.print(" (ok)");
-    } else {
+    } 
+    else {
       //Serial.print(" (x)");
       // we didn't match perfectly, return a false match
       return false;
     }
-    
+
     /*
     Serial.print("  \t"); // tab
-    Serial.print(offcode); // the OFF signal we heard
-    Serial.print(" - ");
-    Serial.print(Signal[i*2 + 1]); // the OFF signal we want 
-    */
-    
+     Serial.print(offcode); // the OFF signal we heard
+     Serial.print(" - ");
+     Serial.print(Signal[i*2 + 1]); // the OFF signal we want 
+     */
+
     if ( abs(offcode - Signal[i*2 + 1]) <= (Signal[i*2 + 1] * FUZZINESS / 100)) {
       //Serial.print(" (ok)");
-    } else {
+    } 
+    else {
       //Serial.print(" (x)");
       // we didn't match perfectly, return a false match
       return false;
     }
-    
+
     //Serial.println();
   }
   // Everything matched!
@@ -311,37 +345,37 @@ boolean IRcompare(int numpulses, int Signal[]) {
 
 int listenForIR(void) {
   currentpulse = 0;
-  
+
   while (1) {
     uint16_t highpulse, lowpulse;  // temporary storage timing
     highpulse = lowpulse = 0; // start out with no pulse length
-  
-//  while (digitalRead(IRpin)) { // this is too slow!
+
+    //  while (digitalRead(IRpin)) { // this is too slow!
     while (IRpin_PIN & (1 << IRpin)) {
-       // pin is still HIGH
+      // pin is still HIGH
 
-       // count off another few microseconds
-       highpulse++;
-       delayMicroseconds(RESOLUTION);
+      // count off another few microseconds
+      highpulse++;
+      delayMicroseconds(RESOLUTION);
 
-       // If the pulse is too long, we 'timed out' - either nothing
-       // was received or the code is finished, so print what
-       // we've grabbed so far, and then reset
-       if ((highpulse >= MAXPULSE) && (currentpulse != 0)) {
-         return currentpulse;
-       }
+      // If the pulse is too long, we 'timed out' - either nothing
+      // was received or the code is finished, so print what
+      // we've grabbed so far, and then reset
+      if ((highpulse >= MAXPULSE) && (currentpulse != 0)) {
+        return currentpulse;
+      }
     }
     // we didn't time out so lets stash the reading
     pulses[currentpulse][0] = highpulse;
-  
+
     // same as above
     while (! (IRpin_PIN & _BV(IRpin))) {
-       // pin is still LOW
-       lowpulse++;
-       delayMicroseconds(RESOLUTION);
-       if ((lowpulse >= MAXPULSE)  && (currentpulse != 0)) {
-         return currentpulse;
-       }
+      // pin is still LOW
+      lowpulse++;
+      delayMicroseconds(RESOLUTION);
+      if ((lowpulse >= MAXPULSE)  && (currentpulse != 0)) {
+        return currentpulse;
+      }
     }
     pulses[currentpulse][1] = lowpulse;
 
@@ -358,7 +392,7 @@ void printpulses(void) {
     Serial.print(pulses[i][1] * RESOLUTION, DEC);
     Serial.println(" usec");
   }
-  
+
   // print it in a 'array' format
   Serial.println("int IRsignal[] = {");
   Serial.println("// ON, OFF (in 10's of microseconds)");
@@ -374,3 +408,6 @@ void printpulses(void) {
   Serial.print(", 0};");
 }
 
+boolean eq(int a, int b){
+  return ( abs(a - b) < 20 ) ;
+}
