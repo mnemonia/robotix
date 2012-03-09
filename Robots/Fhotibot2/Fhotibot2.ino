@@ -97,7 +97,7 @@ void loop(void) {
   if(!bumper()){
     if(!avoider()){
       if(!finder()){
-
+        ;
       }
     }
   }
@@ -144,23 +144,29 @@ boolean avoider(){
 
 boolean finder(){
   int targetDirection = selectTargetDirection(
-                          analogRead(A0), 
-                          analogRead(A1));
+  analogRead(A0), 
+  analogRead(A1));
   if(targetDirection == currentTargetDirectionMemento){
     return false;
   }
 
   IN_.PositionInfo(targetDirection);
-  
+
   currentTargetDirectionMemento = targetDirection;
   return true;
 }
+
+
+
+
+
+
 
 int selectTargetDirection(int valLeft, int valRight){
   if(eq(valLeft,valRight)){
     return C1_Ahead;
   }
-  
+
   if(valLeft > valRight){
     return C1_Left;
   }
@@ -411,3 +417,4 @@ void printpulses(void) {
 boolean eq(int a, int b){
   return ( abs(a - b) < 20 ) ;
 }
+
