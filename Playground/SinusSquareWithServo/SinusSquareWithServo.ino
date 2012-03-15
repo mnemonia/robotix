@@ -1,86 +1,88 @@
+/* 
+ * Smooth servo rotation using a sinus square function.
+ * more infos: http://letsmakerobots.com/node/31697
+ * created by NilsB 
+ */
+
 #include <MsTimer2.h>
 #include <Servo.h> 
 
-int sinusSquareLookupTable[] = {
-  1,
-4,
-10,
-17,
-26,
-37,
-49,
-62,
-76,
-90,
-104,
-118,
-131,
-143,
-154,
-163,
-170,
-176,
-179,
-180};
+const int timerInMillies = 20;
+const int countSinusSquareLookupTableEntries = 100;
+const int sinusSquareLookupTable[] = {
+	0,0,1,1,2,2,3,4,4,5,6,
+	7,9,10,11,13,14,16,17,19,21,22,
+	24,26,28,30,33,35,37,39,42,44,47,
+	49,52,54,57,60,62,65,68,70,73,76,
+	79,82,84,87,90,93,96,98,101,104,107,
+	110,112,115,118,120,123,126,128,131,133,136,
+	138,141,143,145,147,150,152,154,156,158,159,
+	161,163,164,166,167,169,170,171,173,174,175,
+	176,176,177,178,178,179,179,180,180,180,180
+};
+int currentValueIndex = 0;
+const int movmentIndicatorPin = 13;
 
-int steps = 20;
+const Servo headServo;
 
-const int led_pin = 13;			// default to pin 13
+void move()
+{
+  moveServoTo(angle());
 
-Servo headServo;  // create servo object to control a servo 
+  indicateMovement();
+  
+  incrementOrStop();
+}
 
-void flash()
+void moveServoTo(int angle){
+  Serial.println(angle);
+  headServo.write(angle); 
+}
+
+int angle(){
+  return sinusSquareLookupTable[currentValueIndex];
+}
+
+void indicateMovement()
 {
   static boolean output = HIGH;
   
-  digitalWrite(led_pin, output);
+  digitalWrite(movmentIndicatorPin, output);
   output = !output;
 }
 
-void setup(){
-  Serial.begin(9600);
-
-  pinMode(led_pin, OUTPUT);
-
-  MsTimer2::set(1000/20, timerIsr); // 500ms period
-  MsTimer2::start();
-
-  headServo.attach(6);
-  toZero();
-}
-
-void loop(){
-}
-
-/// --------------------------
-/// Custom ISR Timer Routine
-/// --------------------------
-int angleMemento = 0;
-int currentValueIndex = 0;
-void timerIsr()
-{
-  if(steps==currentValueIndex){
-    currentValueIndex = 0;
-  }
-  int angle = sinusSquareLookupTable[currentValueIndex];
-  Serial.println(angle);
-  headServo.write(angle); 
+void incrementOrStop(){
   currentValueIndex++;
-  angleMemento = angle;
-
-  digitalWrite( 13, digitalRead(13) ^ 1 );
-}
-
-int calcRotationDuration(int angle){
-  if(angle > angleMemento){
-    return 10 * (angle - angleMemento);
-  }else if(angle < angleMemento){
-    return 10 * (angleMemento - angle);
+  if(currentValueIndex == countSinusSquareLookupTableEntries - 1){
+    stopMove();
   }
-  return 10;
 }
-void toZero(){  
- // headServo.write(0);                  // sets the servo position according to the scaled value 
-  delay(15);                           // waits for the servo to get there 
+
+void stopMove(){
+  MsTimer2::stop();
+  headServo.detach();
 }
+
+void setupMovementIndicator(){
+  Serial.begin(9600);
+  pinMode(movmentIndicatorPin, OUTPUT);
+}
+
+void setupTimer2(){
+  MsTimer2::set(timerInMillies, move);
+  MsTimer2::start();
+}
+
+void setupServo(){  
+  headServo.attach(6);
+  headServo.write(0); 
+}
+
+void setup(){
+  setupMovementIndicator();
+  setupServo();  
+  setupTimer2();
+}
+
+void loop(){;}
 
