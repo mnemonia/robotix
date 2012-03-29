@@ -2,14 +2,12 @@
 
 const int to = 180;
 
-Servo traceServo;  // create servo object to control a servo 
 Servo headServo;  // create servo object to control a servo 
 
 void setup(){
   Serial.begin(9600);
   
-  traceServo.attach(9);
-  headServo.attach(10);
+  headServo.attach(9);
 
   toZero();
 }
@@ -25,11 +23,23 @@ void servoShow(){
 }
 
 void loop(){
-  headServo.write(45); 
-  delay(1000);
-  headServo.write(135); 
-  delay(1000);
-  //servoShow();
+  headServo.write(0); 
+  delay(500);
+  headServo.write(180); 
+  delay(500);
+  headServo.write(0); 
+  delay(500);
+  headServo.write(180); 
+  delay(500);
+  headServo.write(0); 
+  delay(500);
+  headServo.write(180); 
+  delay(500);
+  headServo.write(0); 
+  delay(500);
+  headServo.write(90); 
+
+  delay(15000);
   
 /*  rotateHead();
   rotateTrace();
