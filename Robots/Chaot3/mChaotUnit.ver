@@ -1,6 +1,6 @@
 
 C Code Generation for CIP MACHINE mChaotUnit in IMPLEMENTATION ChaotImpl of SYSTEM Chaot
-	March 31, 2012 2:06:00 am
+	April 1, 2012 1:29:26 am
 
 
 Errors
@@ -20,6 +20,7 @@ generating header file for CIP MACHINE mChaotUnit.h ...  complete
 generating CIP MACHINE module mChaotUnit.c ...  complete
 generating error header file for CIP MACHINE eChaotUnit.h ...  complete
 generating error module for CIP MACHINE eChaotUnit.c ...  complete
+generating PROCESS module Chaotic.c ...  complete
 generating PROCESS module Controller.c ...  complete
 generating PROCESS module Indicator.c ...  complete
 generating PROCESS module Measure.c ...  complete

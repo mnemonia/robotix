@@ -4,7 +4,7 @@ extern "C"{
 #include <Servo.h> 
  
 Servo shakeServo;  // create servo object to control a servo 
-const int shakeServoPin = 8;
+const int shakeServoPin = 9;
 
 #include <Stepper.h>
 
@@ -29,6 +29,8 @@ long lastTickInMillies = 0L;
 long currentMillies = 0L;
 
 void setup(){
+  Serial.begin(9600);
+  
   pinMode(latchPin, OUTPUT);
   pinMode(dataPin, OUTPUT);  
   pinMode(clockPin, OUTPUT);
@@ -46,11 +48,11 @@ void setup(){
 
 void loop(){
   currentMillies = millis();
-  if(lastTickInMillies + 1000 > currentMillies){
+  if(lastTickInMillies + 10000 > currentMillies){
     lastTickInMillies = currentMillies;
     incrementTime();
   }
-  delay(10);
+  delay(50);
 }
 
 void incrementTime(){
@@ -108,6 +110,7 @@ void uCHAN_ControllerActions (unsigned char name_)
 
 void uCHAN_IndicatorActions (unsigned char name_)
 {
+  Serial.println("IndicatorActions");
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
@@ -141,12 +144,14 @@ void uCHAN_MeasureActions (unsigned char name_)
 	{
 	case C3_MEASURE:
                 theResultIndex = -1;
-                lowestSensorData = 10000;
+                lowestSensorData = 0;
 		for(int index = 0; index < 8; index++){
                   registerWrite(index, HIGH);
+                  delay(500);
                   int lastSensorData = analogRead(photosensorPinLeft);
+                  delay(10);
                   
-                  if(lastSensorData < lowestSensorData){
+                  if(lastSensorData > lowestSensorData){
                     lowestSensorData = lastSensorData;
                     theResultIndex = index;
                   } 
@@ -180,6 +185,22 @@ void uCHAN_ShakerActions (unsigned char name_)
 }
 
 
+void uCHAN_ChaoticActions (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C8_DETECT_HOLD:
+		/* user defined code */
+delay(4000);
+IN_.ChaoticEvents(C7_HALTED);
+
+		break;
+	default: 
+		break;
+	}
+}
+
 /*********************************************************************
 	User defined Output Channel Interface Initialization Function
 *********************************************************************/
@@ -194,6 +215,7 @@ void iCHAN_(void)
 
 		/* Initializing Output Interface */
 
+	OUT_.ChaoticActions = uCHAN_ChaoticActions;
 	OUT_.ControllerActions = uCHAN_ControllerActions;
 	OUT_.IndicatorActions = uCHAN_IndicatorActions;
 	OUT_.MeasureActions = uCHAN_MeasureActions;
