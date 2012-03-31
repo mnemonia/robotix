@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sChaotUnit in IMPLEMENTATION ChaotImpl of SYSTEM Chaot
+	March 31, 2012 2:05:59 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sChaotUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Chaot3
+
+generating CIP Connector Template Module for CIP SHELL _conChaotUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sChaotUnit.h ...  complete
+generating CIP SHELL module sChaotUnit.c ...  complete
+
+Code generation terminated

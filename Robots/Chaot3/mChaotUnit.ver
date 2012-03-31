@@ -1,0 +1,30 @@
+
+C Code Generation for CIP MACHINE mChaotUnit in IMPLEMENTATION ChaotImpl of SYSTEM Chaot
+	March 31, 2012 2:06:00 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mChaotUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Chaot3
+
+generating Error Function Template Module for CIP MACHINE _errChaotUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceChaotUnit.tpl ...  complete
+generating header file for CIP MACHINE mChaotUnit.h ...  complete
+generating CIP MACHINE module mChaotUnit.c ...  complete
+generating error header file for CIP MACHINE eChaotUnit.h ...  complete
+generating error module for CIP MACHINE eChaotUnit.c ...  complete
+generating PROCESS module Controller.c ...  complete
+generating PROCESS module Indicator.c ...  complete
+generating PROCESS module Measure.c ...  complete
+generating PROCESS module Shaker.c ...  complete
+generating trace header file for CIP MACHINE tChaotUnit.h ...  complete
+generating trace module for CIP MACHINE tChaotUnit.c ...  complete
+
+Code generation terminated
