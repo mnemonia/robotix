@@ -6,6 +6,17 @@ extern "C"{
 Servo shakeServo;  // create servo object to control a servo 
 const int shakeServoPin = 8;
 
+#include <Stepper.h>
+
+const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
+                                     // for your motor
+
+// initialize the stepper library on pins 8 through 11:
+Stepper myStepper(stepsPerRevolution, 2,3,4,5);            
+
+int stepCount = 0;         // number of steps the motor has taken
+
+
 int photosensorPinLeft = A0;
 //Pin connected to latch pin (ST_CP) of 74HC595
 const int latchPin = 8;
@@ -101,16 +112,19 @@ void uCHAN_IndicatorActions (unsigned char name_)
 	switch (name_)
 	{
 	case C5_INDICATE_HIGH:
-		/* user defined code */
+		myStepper.step(400);
+                stepCount+=400;
 		break;
 	case C5_INDICATE_LOW:
-		/* user defined code */
+		myStepper.step(100);
+                stepCount+=100;
 		break;
 	case C5_INDICATE_MEDIUM:
-		/* user defined code */
+		myStepper.step(200);
+                stepCount+=200;
 		break;
 	case C5_RESET:
-		/* user defined code */
+                stepCount = 0;
 		break;
 	default: 
 		break;
