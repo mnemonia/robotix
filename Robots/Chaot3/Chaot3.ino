@@ -46,14 +46,14 @@ void setup(){
   }
 }
 
-void loop(){
-  currentMillies = millis();
-  if(lastTickInMillies + 10000 > currentMillies){
-    lastTickInMillies = currentMillies;
-    incrementTime();
-  }
-  delay(50);
-}
+                                          void loop(){
+                                            currentMillies = millis();
+                                            if(lastTickInMillies + 10000 > currentMillies){
+                                              lastTickInMillies = currentMillies;
+                                              incrementTime();
+                                            }
+                                            delay(20);
+                                          }
 
 void incrementTime(){
   TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
