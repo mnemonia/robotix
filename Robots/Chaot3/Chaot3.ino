@@ -46,19 +46,19 @@ void setup(){
   }
 }
 
-                                          void loop(){
-                                            currentMillies = millis();
-                                            if(lastTickInMillies + 10000 > currentMillies){
-                                              lastTickInMillies = currentMillies;
-                                              incrementTime();
-                                            }
-                                            delay(20);
-                                          }
+void loop(){
+  currentMillies = millis();
+  if(lastTickInMillies + 10000 > currentMillies){
+    lastTickInMillies = currentMillies;
+    incrementTime();
+  }
+  delay(20);
+}
 
 void incrementTime(){
   TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
   if (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
-  Serial.println("TICK");
+  //Serial.println("TICK");
 }
 
 // This method sends bits to the shift register:
@@ -73,6 +73,27 @@ void registerWrite(int whichPin, int whichState) {
 
   // turn on the next highest bit in bitsToSend:
   bitWrite(bitsToSend, whichPin, whichState);
+
+  // shift the bits out:
+  shiftOut(dataPin, clockPin, MSBFIRST, bitsToSend);
+
+    // turn on the output so the LEDs can light up:
+  digitalWrite(latchPin, HIGH);
+
+}
+
+void registerWriteAll(int whichState) {
+// the bits you want to send
+  byte bitsToSend = 0;
+
+  // turn off the output so the pins don't light up
+  // while you're shifting bits:
+  digitalWrite(latchPin, LOW);
+
+  // turn on the next highest bit in bitsToSend:
+  for(int whichPin = 0; whichPin<8; whichPin++){
+    bitWrite(bitsToSend, whichPin, whichState);
+  }
 
   // shift the bits out:
   shiftOut(dataPin, clockPin, MSBFIRST, bitsToSend);
@@ -102,6 +123,7 @@ void uCHAN_ControllerActions (unsigned char name_)
 	{
 	case C6_DRAWED:
 		/* user defined code */
+IN_.Start(C1_START);
 		break;
 	default: 
 		break;
@@ -135,7 +157,7 @@ void uCHAN_IndicatorActions (unsigned char name_)
 }
 
 int theResultIndex;
-int lowestSensorData;
+int highestSensorData;
 
 void uCHAN_MeasureActions (unsigned char name_)
 {
@@ -143,16 +165,23 @@ void uCHAN_MeasureActions (unsigned char name_)
 	switch (name_)
 	{
 	case C3_MEASURE:
+                registerWriteAll(LOW);
                 theResultIndex = -1;
-                lowestSensorData = 0;
+                highestSensorData = 0;
+                
 		for(int index = 0; index < 8; index++){
                   registerWrite(index, HIGH);
-                  delay(500);
+                  delay(50);
+                }
+                
+		for(int index = 0; index < 8; index++){
+                  registerWrite(index, HIGH);
+                  delay(250);
                   int lastSensorData = analogRead(photosensorPinLeft);
-                  delay(10);
-                  
-                  if(lastSensorData > lowestSensorData){
-                    lowestSensorData = lastSensorData;
+                  delay(50);
+
+                  if(lastSensorData > highestSensorData){
+                    highestSensorData = lastSensorData;
                     theResultIndex = index;
                   } 
                 }
@@ -174,10 +203,10 @@ void uCHAN_ShakerActions (unsigned char name_)
 		shakeServo.write(90);
 		break;
 	case C2_LEFT:
-		shakeServo.write(0);
+		shakeServo.write(20);
 		break;
 	case C2_RIGHT:
-		shakeServo.write(180);
+		shakeServo.write(160);
 		break;
 	default: 
 		break;
@@ -191,6 +220,7 @@ void uCHAN_ChaoticActions (unsigned char name_)
 	switch (name_)
 	{
 	case C8_DETECT_HOLD:
+registerWriteAll(HIGH);
 		/* user defined code */
 delay(4000);
 IN_.ChaoticEvents(C7_HALTED);
