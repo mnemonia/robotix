@@ -7,13 +7,14 @@ const int stepsPerRevolution = 360;  // change this to fit the number of steps p
 Stepper myStepper(stepsPerRevolution, 6,7);            
 
 void setup() {
-  myStepper.setSpeed(165);
+  myStepper.setSpeed(90);
   // initialize the serial port:
   Serial.begin(9600);
 }
 
 void loop() {
    rotate360();
+   delay(1000);
    rotate360CC();
 
    delay(2000);
