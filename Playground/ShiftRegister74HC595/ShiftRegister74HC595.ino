@@ -33,7 +33,17 @@ void setup() {
 }
 
 void loop() {
+  for(int index = 0; index < 8; index++){
+    registerWrite(index, HIGH);
+    delay(250);
   Serial.println(analogRead(photosensorPinLeft));
+    delay(5000);
+    registerWrite(index, LOW);
+    delay(250);
+  Serial.println(analogRead(photosensorPinLeft));
+    delay(250);
+  }
+  /*
   if (Serial.available() > 0) {
     // ASCII '0' through '9' characters are
     // represented by the values 48 through 57.
@@ -44,6 +54,7 @@ void loop() {
   // write to the shift register with the correct bit set high:
     registerWrite(bitToSet, HIGH);
   }
+  */
 }
 
 // This method sends bits to the shift register:
