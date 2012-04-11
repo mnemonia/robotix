@@ -8,11 +8,12 @@ const int shakeServoPin = 9;
 
 #include <Stepper.h>
 
-const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
+const int ZERO_TO_ONE_STEPS = 2;
+const int stepsPerRevolution = 360;  // change this to fit the number of steps per revolution
                                      // for your motor
-
+                                     
 // initialize the stepper library on pins 8 through 11:
-Stepper myStepper(stepsPerRevolution, 2,3,4,5);            
+Stepper myStepper(stepsPerRevolution, 6, 7);            
 
 int stepCount = 0;         // number of steps the motor has taken
 
@@ -103,6 +104,17 @@ void registerWriteAll(int whichState) {
 
 }
 
+void rotateIndicatorFwd(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper.step(-stepsPerRevolution);
+   }
+}
+void rotateIndicatorBwd(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper.step(stepsPerRevolution);
+   }
+}
+
 extern "C" {
 
   /*********************************************************************
@@ -130,23 +142,23 @@ IN_.Start(C1_START);
 	}
 }
 
-void uCHAN_IndicatorActions (unsigned char name_)
+void uCHAN_IndicatorActions (unsigned char name_, 
+	union tDATA_IndicatorActions *data_)
 {
-  Serial.println("IndicatorActions");
+  int number = data_->_Results.Number;
+  Serial.print("IndicatorActions Number ");
+  Serial.println(number);
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
 	case C5_INDICATE_HIGH:
-		myStepper.step(400);
-                stepCount+=400;
+                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_INDICATE_LOW:
-		myStepper.step(100);
-                stepCount+=100;
+                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_INDICATE_MEDIUM:
-		myStepper.step(200);
-                stepCount+=200;
+                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_RESET:
                 stepCount = 0;
@@ -158,6 +170,7 @@ void uCHAN_IndicatorActions (unsigned char name_)
 
 int theResultIndex;
 int highestSensorData;
+union tDATA_MeasureEvents data_MeasureEvents;
 
 void uCHAN_MeasureActions (unsigned char name_)
 {
@@ -187,7 +200,8 @@ void uCHAN_MeasureActions (unsigned char name_)
                 }
                 
                 registerWrite(theResultIndex, HIGH);
-                IN_.MeasureEvents(C4_DONE);
+                data_MeasureEvents._Results.Number = theResultIndex;
+                IN_.MeasureEvents(C4_DONE, &data_MeasureEvents);
 		break;
 	default: 
 		break;
@@ -252,5 +266,4 @@ void iCHAN_(void)
 	OUT_.ShakerActions = uCHAN_ShakerActions;
 }
 
-  
-}
+ }
