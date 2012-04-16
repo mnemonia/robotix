@@ -8,15 +8,15 @@ const int shakeServoPin = 9;
 
 #include <Stepper.h>
 
-const int ZERO_TO_ONE_STEPS = 2;
-const int stepsPerRevolution = 360;  // change this to fit the number of steps per revolution
+const int ZERO_TO_ONE_STEPS = 5;
+const int stepsPerRevolution = 180;  // change this to fit the number of steps per revolution
                                      // for your motor
                                      
 // initialize the stepper library on pins 8 through 11:
-Stepper myStepper(stepsPerRevolution, 6, 7);            
+Stepper myStepper_1(stepsPerRevolution, 6, 7);            
+Stepper myStepper_2(stepsPerRevolution, 2, 3);            
 
 int stepCount = 0;         // number of steps the motor has taken
-
 
 int photosensorPinLeft = A0;
 //Pin connected to latch pin (ST_CP) of 74HC595
@@ -26,8 +26,9 @@ const int clockPin = 12;
 ////Pin connected to Data in (DS) of 74HC595
 const int dataPin = 11;
 
-long lastTickInMillies = 0L;
 long currentMillies = 0L;
+long previousMillis = 0;
+long interval = 20;  
 
 void setup(){
   Serial.begin(9600);
@@ -36,6 +37,9 @@ void setup(){
   pinMode(dataPin, OUTPUT);  
   pinMode(clockPin, OUTPUT);
   shakeServo.attach(shakeServoPin);
+  
+  myStepper_1.setSpeed(200);
+  myStepper_2.setSpeed(200);
   
   if (fINIT_())
   {
@@ -48,18 +52,19 @@ void setup(){
 }
 
 void loop(){
-  currentMillies = millis();
-  if(lastTickInMillies + 10000 > currentMillies){
-    lastTickInMillies = currentMillies;
-    incrementTime();
-  }
-  delay(20);
+  unsigned long currentMillis = millis();
+ 
+  if(currentMillis - previousMillis > interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis; 
+   incrementTime();
+  }  
 }
 
 void incrementTime(){
   TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
   if (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
-  //Serial.println("TICK");
+//  Serial.println("TICK");
 }
 
 // This method sends bits to the shift register:
@@ -104,14 +109,19 @@ void registerWriteAll(int whichState) {
 
 }
 
-void rotateIndicatorFwd(int steps){
+void rotateIndicatorFwdOnFirst(int steps){
    for(int i=0; i<steps; i++){
-      myStepper.step(-stepsPerRevolution);
+      myStepper_1.step(-stepsPerRevolution);
+   }
+}
+void rotateIndicatorFwdOnSecond(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper_2.step(stepsPerRevolution);
    }
 }
 void rotateIndicatorBwd(int steps){
    for(int i=0; i<steps; i++){
-      myStepper.step(stepsPerRevolution);
+      myStepper_1.step(stepsPerRevolution);
    }
 }
 
@@ -135,7 +145,8 @@ void uCHAN_ControllerActions (unsigned char name_)
 	{
 	case C6_DRAWED:
 		/* user defined code */
-IN_.Start(C1_START);
+Serial.println("START");
+              IN_.Start(C1_START);
 		break;
 	default: 
 		break;
@@ -152,13 +163,13 @@ void uCHAN_IndicatorActions (unsigned char name_,
 	switch (name_)
 	{
 	case C5_INDICATE_HIGH:
-                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
+                // rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_INDICATE_LOW:
-                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
+                rotateIndicatorFwdOnFirst(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_INDICATE_MEDIUM:
-                rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
+                rotateIndicatorFwdOnSecond(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_RESET:
                 stepCount = 0;
@@ -178,6 +189,7 @@ void uCHAN_MeasureActions (unsigned char name_)
 	switch (name_)
 	{
 	case C3_MEASURE:
+Serial.println("MEASURE");
                 registerWriteAll(LOW);
                 theResultIndex = -1;
                 highestSensorData = 0;
@@ -214,12 +226,15 @@ void uCHAN_ShakerActions (unsigned char name_)
 	switch (name_)
 	{
 	case C2_CENTER:
+Serial.println("SHAKE CENTER");
 		shakeServo.write(90);
 		break;
 	case C2_LEFT:
+Serial.println("SHAKE LEFT");
 		shakeServo.write(20);
 		break;
 	case C2_RIGHT:
+Serial.println("SHAKE RIGHT");
 		shakeServo.write(160);
 		break;
 	default: 
@@ -234,9 +249,10 @@ void uCHAN_ChaoticActions (unsigned char name_)
 	switch (name_)
 	{
 	case C8_DETECT_HOLD:
+Serial.println("DETECT HOLD");
 registerWriteAll(HIGH);
 		/* user defined code */
-delay(4000);
+delay(6000);
 IN_.ChaoticEvents(C7_HALTED);
 
 		break;
