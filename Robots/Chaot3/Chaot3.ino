@@ -8,13 +8,15 @@ const int shakeServoPin = 9;
 
 #include <Stepper.h>
 
-const int ZERO_TO_ONE_STEPS = 5;
-const int stepsPerRevolution = 180;  // change this to fit the number of steps per revolution
+const int ZERO_TO_ONE_STEPS = 1;
+const int stepsPerRevolution = 360;  // change this to fit the number of steps per revolution
                                      // for your motor
                                      
 // initialize the stepper library on pins 8 through 11:
 Stepper myStepper_1(stepsPerRevolution, 6, 7);            
-Stepper myStepper_2(stepsPerRevolution, 2, 3);            
+Stepper myStepper_2(stepsPerRevolution, 4, 5);            
+Stepper myStepper_3(stepsPerRevolution, 2, 3);            
+Stepper myStepper_4(stepsPerRevolution, 0, 1);            
 
 int stepCount = 0;         // number of steps the motor has taken
 
@@ -38,8 +40,12 @@ void setup(){
   pinMode(clockPin, OUTPUT);
   shakeServo.attach(shakeServoPin);
   
-  myStepper_1.setSpeed(200);
-  myStepper_2.setSpeed(200);
+  myStepper_1.setSpeed(50);
+  myStepper_2.setSpeed(50);
+  myStepper_3.setSpeed(50);
+  myStepper_4.setSpeed(50);
+  
+  registerWriteAll(HIGH);
   
   if (fINIT_())
   {
@@ -119,6 +125,16 @@ void rotateIndicatorFwdOnSecond(int steps){
       myStepper_2.step(stepsPerRevolution);
    }
 }
+void rotateIndicatorFwdOnThird(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper_3.step(-stepsPerRevolution);
+   }
+}
+void rotateIndicatorFwdOnFourth(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper_4.step(-stepsPerRevolution);
+   }
+}
 void rotateIndicatorBwd(int steps){
    for(int i=0; i<steps; i++){
       myStepper_1.step(stepsPerRevolution);
@@ -163,7 +179,9 @@ void uCHAN_IndicatorActions (unsigned char name_,
 	switch (name_)
 	{
 	case C5_INDICATE_HIGH:
-                // rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
+                rotateIndicatorFwdOnThird(number*ZERO_TO_ONE_STEPS);
+                rotateIndicatorFwdOnFourth(number*ZERO_TO_ONE_STEPS);
+// rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
 		break;
 	case C5_INDICATE_LOW:
                 rotateIndicatorFwdOnFirst(number*ZERO_TO_ONE_STEPS);
@@ -227,7 +245,7 @@ void uCHAN_ShakerActions (unsigned char name_)
 	{
 	case C2_CENTER:
 Serial.println("SHAKE CENTER");
-		shakeServo.write(90);
+		shakeServo.write(105);
 		break;
 	case C2_LEFT:
 Serial.println("SHAKE LEFT");
@@ -235,7 +253,7 @@ Serial.println("SHAKE LEFT");
 		break;
 	case C2_RIGHT:
 Serial.println("SHAKE RIGHT");
-		shakeServo.write(160);
+		shakeServo.write(180);
 		break;
 	default: 
 		break;
