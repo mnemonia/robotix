@@ -8,17 +8,14 @@ const int shakeServoPin = 9;
 
 #include <Stepper.h>
 
-const int ZERO_TO_ONE_STEPS = 1;
-const int stepsPerRevolution = 360;  // change this to fit the number of steps per revolution
+
+const int stepsPerRevolution = 2032;  // change this to fit the number of steps per revolution
                                      // for your motor
                                      
 // initialize the stepper library on pins 8 through 11:
-Stepper myStepper_1(stepsPerRevolution, 6, 7);            
-Stepper myStepper_2(stepsPerRevolution, 4, 5);            
-Stepper myStepper_3(stepsPerRevolution, 2, 3);            
-Stepper myStepper_4(stepsPerRevolution, 0, 1);            
-
-int stepCount = 0;         // number of steps the motor has taken
+Stepper myStepper1(stepsPerRevolution, 7,6);            
+Stepper myStepper2(stepsPerRevolution, 2,3);            
+Stepper myStepper3(stepsPerRevolution, 5,4);            
 
 int photosensorPinLeft = A0;
 //Pin connected to latch pin (ST_CP) of 74HC595
@@ -40,12 +37,12 @@ void setup(){
   pinMode(clockPin, OUTPUT);
   shakeServo.attach(shakeServoPin);
   
-  myStepper_1.setSpeed(50);
-  myStepper_2.setSpeed(50);
-  myStepper_3.setSpeed(50);
-  myStepper_4.setSpeed(50);
-  
+  myStepper1.setSpeed(3);
+  myStepper2.setSpeed(3);
+  myStepper3.setSpeed(3);
+
   registerWriteAll(HIGH);
+  //registerWriteAll(HIGH);
   
   if (fINIT_())
   {
@@ -115,33 +112,71 @@ void registerWriteAll(int whichState) {
 
 }
 
-void rotateIndicatorFwdOnFirst(int steps){
+
+void rotateFwd1(int steps){
    for(int i=0; i<steps; i++){
-      myStepper_1.step(-stepsPerRevolution);
+      myStepper1.step(1);
    }
 }
-void rotateIndicatorFwdOnSecond(int steps){
+void rotateBwd1(int steps){
    for(int i=0; i<steps; i++){
-      myStepper_2.step(stepsPerRevolution);
+      myStepper1.step(-1);
    }
 }
-void rotateIndicatorFwdOnThird(int steps){
+
+void rotateFwd2(int steps){
    for(int i=0; i<steps; i++){
-      myStepper_3.step(-stepsPerRevolution);
+      myStepper2.step(1);
    }
 }
-void rotateIndicatorFwdOnFourth(int steps){
+void rotateBwd2(int steps){
    for(int i=0; i<steps; i++){
-      myStepper_4.step(-stepsPerRevolution);
+      myStepper2.step(-1);
    }
 }
+
+void rotateFwd3(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper3.step(1);
+   }
+}
+void rotateBwd3(int steps){
+   for(int i=0; i<steps; i++){
+      myStepper3.step(-1);
+   }
+}
+
 void rotateIndicatorBwd(int steps){
    for(int i=0; i<steps; i++){
-      myStepper_1.step(stepsPerRevolution);
+//      myStepper_1.step(stepsPerRevolution);
    }
 }
 
 extern "C" {
+  const int IndicatorFigure0 =	0	;
+const int IndicatorFigure1 =	254	;
+const int IndicatorFigure2 =	508	;
+const int IndicatorFigure3 =	762	;
+const int IndicatorFigure4 =	1016	;
+const int IndicatorFigure5 =	1270	;
+const int IndicatorFigure6 =	1524	;
+const int IndicatorFigure7 =	1778	;
+const int IndicatorFigure8 =	2032	;
+
+int IndicatorFigures[8] = {
+  IndicatorFigure0,
+  IndicatorFigure1,
+  IndicatorFigure2,
+  IndicatorFigure3,
+  IndicatorFigure4,
+  IndicatorFigure5,
+  IndicatorFigure6,
+  IndicatorFigure7
+};
+
+int currentMin = 0;
+int currentMedium = 0;
+int currentMax = 0;
 
   /*********************************************************************
 	User defined Output Channel Functions
@@ -179,18 +214,24 @@ void uCHAN_IndicatorActions (unsigned char name_,
 	switch (name_)
 	{
 	case C5_INDICATE_HIGH:
-                rotateIndicatorFwdOnThird(number*ZERO_TO_ONE_STEPS);
-                rotateIndicatorFwdOnFourth(number*ZERO_TO_ONE_STEPS);
-// rotateIndicatorFwd(number*ZERO_TO_ONE_STEPS);
+          rotateFwd3(IndicatorFigures[number]);
+          currentMax = number;
 		break;
 	case C5_INDICATE_LOW:
-                rotateIndicatorFwdOnFirst(number*ZERO_TO_ONE_STEPS);
+          rotateFwd1(IndicatorFigures[number]);
+          currentMin = number;
 		break;
 	case C5_INDICATE_MEDIUM:
-                rotateIndicatorFwdOnSecond(number*ZERO_TO_ONE_STEPS);
+            rotateFwd2(IndicatorFigures[number]);
+          currentMedium = number;            
 		break;
 	case C5_RESET:
-                stepCount = 0;
+          rotateBwd1(currentMin);
+          rotateBwd2(currentMedium);
+          rotateBwd3(currentMax);
+                currentMin = 0;
+                currentMedium = 0;
+                currentMax = 0;
 		break;
 	default: 
 		break;
