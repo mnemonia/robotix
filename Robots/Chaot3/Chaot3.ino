@@ -281,6 +281,7 @@ Serial.println("MEASURE");
 
 void uCHAN_ShakerActions (unsigned char name_)
 {
+        registerWriteAll(HIGH);
 	/* Accessing MESSAGE */
 	switch (name_)
 	{
@@ -309,6 +310,7 @@ void uCHAN_ChaoticActions (unsigned char name_)
 	{
 	case C8_DETECT_HOLD:
 Serial.println("DETECT HOLD");
+
 registerWriteAll(HIGH);
 		/* user defined code */
 delay(6000);
