@@ -9,7 +9,7 @@ const int leftYellow = 8;
 const int rightRed = 7;
 const int rightYellow = 6;
 const int center = 5;
-//const int playPin = 9;
+const int playPin = 9;
 //const int recordPin = 10;
 const int headServoPin = 11;
 
@@ -41,7 +41,7 @@ void setup() {
   out(rightRed);     
   out(rightYellow);     
   out(center);     
-  //out(playPin);     
+  out(playPin);     
 
   on(center);
   playTune();
@@ -49,8 +49,6 @@ void setup() {
 }
 
 void loop() {
-// moveFromCenterToMax();
-// moveFromMaxToCenter();
 
  moveFromCenterToMax();
 //rotate();
@@ -122,7 +120,7 @@ moveFromMaxToMin();
   off(rightRed);
   off(rightYellow);
 
-//playTune();
+playTune();
 //sendMsgFaiSchifo();  
 moveFromMinToCenter();
 //rotate();
@@ -172,9 +170,9 @@ delay(25);
 } 
 
 void playTune() {
-//  digitalWrite(playPin, HIGH); 
-//  delay(50);
-//  digitalWrite(playPin, LOW);
+  digitalWrite(playPin, HIGH); 
+  delay(50);
+  digitalWrite(playPin, LOW);
 }
 void morse(char code, int messagePin){
   if(code=='.'){
