@@ -9,32 +9,16 @@ const int leftYellow = 8;
 const int rightRed = 7;
 const int rightYellow = 6;
 const int center = 5;
+//const int playPin = 9;
+//const int recordPin = 10;
 const int headServoPin = 11;
 
 const int timerInMillies = 130;
-const int countSinusSquareLookupTableEntries = 62;
-const int lookupTableCenter = countSinusSquareLookupTableEntries / 2;
-int currentLookupTable = 10;
+const int servoTimerInMillies = 130;
 
-const int sinusSquareLookupTable90Plus10[] = {
-  80, 80, 80, 80, 80, 80, 80, 81	,
-  81, 81, 82, 82, 83, 84, 84, 85	,
-  86, 86, 87, 88, 88, 89, 89, 89	,
-  90, 90, 90, 90, 90, 90, 90, 90	,
-  90, 90, 90, 90, 90, 91, 91, 91	,
-  92, 92, 93, 94, 94, 95, 96, 96	,
-  97, 98, 98, 99, 99, 99, 100, 100	,
-  100, 100, 100, 100, 100, 100};
-
-const int sinusSquareLookupTable90Plus5[] = {
-  85, 85, 85, 85, 85, 85, 85, 85	,
-  86, 86, 86, 86, 87, 87, 87, 88	,
-  88, 88, 88, 89, 89, 89, 89, 90	,
-  90, 90, 90, 90, 90, 90, 90, 90	,
-  90, 90, 90, 90, 90, 90, 91, 91	,
-  91, 91, 92, 92, 92, 93, 93, 93	,
-  93, 94, 94, 94, 94, 95, 95, 95	,
-  95, 95, 95, 95, 95, 95};
+const int servoCenterAngle = 90;
+const int servoMaxAngle = 102;//175;//100;
+const int servoMinAngle = 78;//20;//80;
 
 char spaghuzzinatorIsHere[] = "... .--. .- --. .... ..- --.. --.. .. -. .- - --- .-.   .. ...   .... . .-. . ";
 const int spaghuzzinatorIsHereCount = 79;
@@ -42,46 +26,8 @@ const int spaghuzzinatorIsHereCount = 79;
 char youAreTerminated[] = "-.-- --- ..-   .- .-. .   - . .-. -- .. -. .- - . -.. ";
 const int youAreTerminatedCount = 55;
 
-void sendSpaghuzzinatorIsHere(){
-  int messagePin = rightYellow;
-  for(int pos = 0; pos < spaghuzzinatorIsHereCount; pos++){
-    morse(spaghuzzinatorIsHere[pos], messagePin);
-  }
-}
-void sendYouAreTerminated(){
-  int messagePin = leftRed;  
-  for(int pos = 0; pos < youAreTerminatedCount; pos++){
-    morse(youAreTerminated[pos], messagePin);
-  }
-}
-void morse(char code, int messagePin){
-  if(code=='.'){
-    on(messagePin);
-    delay(90);
-    off(messagePin);
-  }
-  else if(code=='-'){
-    on(messagePin);
-    delay(180);
-    off(messagePin);
-  }
-  else if(code==' '){
-    off(messagePin);
-    delay(360);
-    off(messagePin);
-  }
-  delay(90);
-}
-
-void out(int pin){
-  pinMode(pin,OUTPUT);
-}
-void on(int pin){
-  digitalWrite(pin,HIGH);
-}
-void off(int pin){
-  digitalWrite(pin,LOW);
-}
+char msgFaiSchifo[] = "..-. .- ..   ... -.-. .... .. ..-. --- ";
+const int msgFaiSchifoCount = 40;
 
 void setup() {     
   Serial.begin(9600);
@@ -95,34 +41,23 @@ void setup() {
   out(rightRed);     
   out(rightYellow);     
   out(center);     
+  //out(playPin);     
 
   on(center);
-}
-
-void rotate() 
-{ 
-  move();
-  /*
-  int theDelay = 150;
-   for(pos = 90; pos <= 110; pos += 1)  // goes from 0 degrees to 180 degrees 
-   {                                  // in steps of 1 degree 
-   headServo.write(pos);              // tell servo to go to position in variable 'pos' 
-   delay(theDelay);                       // waits 15ms for the servo to reach the position 
-   } 
-   delay(2000);
-   for(pos = 110; pos >= 90; pos -= 1)  // goes from 0 degrees to 180 degrees 
-   {                                  // in steps of 1 degree 
-   headServo.write(pos);              // tell servo to go to position in variable 'pos' 
-   delay(theDelay);                       // waits 15ms for the servo to reach the position 
-   } 
-   */
+  playTune();
+  delay(2000);
 }
 
 void loop() {
+// moveFromCenterToMax();
+// moveFromMaxToCenter();
+
+ moveFromCenterToMax();
+//rotate();
 
   allOn();
   allOff();
-  sendSpaghuzzinatorIsHere();
+//  sendSpaghuzzinatorIsHere();
   allOff();
   delay(2000);
   strobeShortAndFast(rightYellow);
@@ -134,9 +69,8 @@ void loop() {
   off(rightRed);
   on(rightYellow);
 
-
-  currentLookupTable = 10;  
-  moveFromCenterToMax();
+// rotate();
+ moveFromMaxToCenter();
 
   delay(1000);              // wait for a second
   on(leftRed);
@@ -144,7 +78,8 @@ void loop() {
   on(rightRed);
   off(rightYellow);
 
-  moveFromMaxToCenter();
+//rotate();
+moveFromCenterToMin();
 
   delay(1000);              // wait for a second
   off(leftRed);
@@ -152,14 +87,16 @@ void loop() {
   off(rightRed);
   on(rightYellow);
 
-  currentLookupTable = 5;  
-  moveFromCenterToMin();
-  sendYouAreTerminated();
+ moveFromMinToCenter();
+//rotate();
+
+ // sendYouAreTerminated();
   
   allOff();
   strobeLongAndSlow(rightRed);
   allOn();
-  moveFromMinToMax();
+moveFromCenterToMin();
+//rotate();
   delay(1000);              // wait for a second
 
   off(leftRed);
@@ -174,23 +111,121 @@ void loop() {
   on(rightRed);
   off(rightYellow);
   delay(400);              // wait for a second
-
-  moveFromMaxToMin();
+moveFromMinToMax();
+//rotate();
   delay(1000);              // wait for a second
+moveFromMaxToMin();
+//rotate();
 
-  moveFromMinToCenter();
-  //rotate();
   off(leftRed);
   off(leftYellow);
   off(rightRed);
   off(rightYellow);
+
+//playTune();
+//sendMsgFaiSchifo();  
+moveFromMinToCenter();
+//rotate();
   delay(1000);              // wait for a second
+}
 
+void sendSpaghuzzinatorIsHere(){
+  int messagePin = rightYellow;
+  off(messagePin);
+  for(int pos = 0; pos < spaghuzzinatorIsHereCount; pos++){
+    morse(spaghuzzinatorIsHere[pos], messagePin);
+  }
+}
+void sendYouAreTerminated(){
+  int messagePin = leftRed;  
+  off(messagePin);
+  for(int pos = 0; pos < youAreTerminatedCount; pos++){
+    morse(youAreTerminated[pos], messagePin);
+  }
+}
+void sendMsgFaiSchifo(){
+  int messagePin1 = leftYellow;  
+  int messagePin2 = rightRed;  
+  off(messagePin1);
+  off(messagePin2);
+  for(int pos = 0; pos < msgFaiSchifoCount; pos++){
+    morse(msgFaiSchifo[pos], messagePin1, messagePin2);
+    morse(msgFaiSchifo[pos], messagePin1, messagePin2);
+  }
+}
 
-  //currentLookupTable = 5;  
-  //rotate();
+void rotate() 
+{ 
+  headServo.attach(headServoPin);
+  for(pos = 5; pos <= 175; pos += 1)  // goes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+delay(25);    
+  for(pos = 175; pos>=5; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(15);                       // waits 15ms for the servo to reach the position 
+  } 
+  headServo.detach();
+} 
 
-  delay(1000);              // wait for a second
+void playTune() {
+//  digitalWrite(playPin, HIGH); 
+//  delay(50);
+//  digitalWrite(playPin, LOW);
+}
+void morse(char code, int messagePin){
+  if(code=='.'){
+    on(messagePin);
+    delay(60);
+    off(messagePin);
+  }
+  else if(code=='-'){
+    on(messagePin);
+    delay(120);
+    off(messagePin);
+  }
+  else if(code==' '){
+    off(messagePin);
+    delay(240);
+    off(messagePin);
+  }
+  delay(90);
+}
+void morse(char code, int messagePin1, int messagePin2){
+  if(code=='.'){
+    on(messagePin1);
+    on(messagePin2);
+    delay(60);
+    off(messagePin1);
+    off(messagePin2);
+  }
+  else if(code=='-'){
+    on(messagePin1);
+    on(messagePin2);
+    delay(120);
+    off(messagePin1);
+    off(messagePin2);
+  }
+  else if(code==' '){
+    off(messagePin1);
+    off(messagePin2);
+    delay(240);
+    off(messagePin1);
+    off(messagePin2);
+  }
+  delay(90);
+}
+void out(int pin){
+  pinMode(pin,OUTPUT);
+}
+void on(int pin){
+  digitalWrite(pin,HIGH);
+}
+void off(int pin){
+  digitalWrite(pin,LOW);
 }
 
 void toggleFaster(int pinOne, int pinTwo){
@@ -236,62 +271,62 @@ void allOn(){
   on(rightRed);
   on(rightYellow);
 }
+void moveFromMaxToCenter(){
+  headServo.attach(headServoPin);
+   for(pos = servoMaxAngle; pos >= servoCenterAngle; pos -= 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+   headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+   delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
+}
 void moveFromMinToMax(){
-  moveFwd(0, countSinusSquareLookupTableEntries);
+  headServo.attach(headServoPin);
+  // move();
+   for(pos = servoMinAngle; pos <= servoMaxAngle; pos += 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+     headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+     delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
 }
 void moveFromCenterToMax(){
-  moveFwd(lookupTableCenter, countSinusSquareLookupTableEntries);
+  headServo.attach(headServoPin);
+  // move();
+   for(pos = servoCenterAngle; pos <= servoMaxAngle; pos += 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+     headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+     delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
 }
 void moveFromMinToCenter(){
-  moveFwd(0, lookupTableCenter);
+  headServo.attach(headServoPin);
+  // move();
+   for(pos = servoMinAngle; pos <= servoCenterAngle; pos += 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+     headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+     delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
 }
 void moveFromMaxToMin(){
-  moveBwd(countSinusSquareLookupTableEntries, 0);
+  headServo.attach(headServoPin);
+   for(pos = servoMaxAngle; pos >= servoMinAngle; pos -= 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+   headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+   delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
 }
 void moveFromCenterToMin(){
-  moveBwd(lookupTableCenter, 0);
-}
-void moveFromMaxToCenter(){
-  moveBwd(countSinusSquareLookupTableEntries, lookupTableCenter);
-}
-void moveFwd(int from, int to){
-  for(int angleIndex = from; angleIndex < to; angleIndex++){
-    moveServoTo(angle(angleIndex));
-    wait();
-  }
-}
-void moveBwd(int from, int to){
-  for(int angleIndex = from-1; angleIndex >= to; angleIndex--){
-    moveServoTo(angle(angleIndex));
-    wait();
-  }
-}
-
-/*
-* This is the function that gets called periodically.
- */
-void move()
-{
-
-  moveFromMinToMax();
-  waitLong();
-  waitLong();
-  waitLong();
-  waitLong();
-
-  waitLong();
-}
-
-void moveServoTo(int angle){
-  Serial.println(angle);
-  headServo.write(angle); 
-}
-
-int angle(int index){
-  if(currentLookupTable==5){
-    return sinusSquareLookupTable90Plus5[index];
-  }
-  return sinusSquareLookupTable90Plus10[index];
+  headServo.attach(headServoPin);
+   for(pos = servoCenterAngle; pos >= servoMinAngle; pos -= 1)  // goes from 0 degrees to 180 degrees 
+   {                                  // in steps of 1 degree 
+   headServo.write(pos);              // tell servo to go to position in variable 'pos' 
+   delay(servoTimerInMillies);                       // waits 15ms for the servo to reach the position 
+   } 
+  headServo.detach();
 }
 
 void stopMove(){
@@ -300,7 +335,7 @@ void stopMove(){
 
 void setupServo(){  
   headServo.attach(headServoPin);
-  headServo.write(0); 
+  headServo.write(servoCenterAngle); 
 }
 
 void wait(){
