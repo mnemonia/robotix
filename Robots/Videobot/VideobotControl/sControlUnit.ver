@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sControlUnit in IMPLEMENTATION Control of SYSTEM Videobot
+	May 21, 2012 8:09:12 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sControlUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Videobot\VideobotControl
+
+generating CIP Connector Template Module for CIP SHELL _conControlUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sControlUnit.h ...  complete
+generating CIP SHELL module sControlUnit.c ...  complete
+
+Code generation terminated

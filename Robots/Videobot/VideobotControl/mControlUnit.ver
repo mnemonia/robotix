@@ -1,0 +1,27 @@
+
+C Code Generation for CIP MACHINE mControlUnit in IMPLEMENTATION Control of SYSTEM Videobot
+	May 21, 2012 8:09:16 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mControlUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Videobot\VideobotControl
+
+generating Error Function Template Module for CIP MACHINE _errControlUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceControlUnit.tpl ...  complete
+generating header file for CIP MACHINE mControlUnit.h ...  complete
+generating CIP MACHINE module mControlUnit.c ...  complete
+generating error header file for CIP MACHINE eControlUnit.h ...  complete
+generating error module for CIP MACHINE eControlUnit.c ...  complete
+generating PROCESS module PlayerMode.c ...  complete
+generating trace header file for CIP MACHINE tControlUnit.h ...  complete
+generating trace module for CIP MACHINE tControlUnit.c ...  complete
+
+Code generation terminated
