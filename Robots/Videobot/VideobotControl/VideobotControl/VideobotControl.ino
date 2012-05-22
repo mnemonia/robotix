@@ -16,6 +16,7 @@ const int BWD_IDLE_PIN = 4;
 const int BWD_ACTIVE_PIN = 5;
 const int ON_PIN = 6;
 
+const int treshold = 600;
 
 
 void setup() {         
@@ -36,7 +37,7 @@ void loop() {
   int bwdControl = analogRead(A1);
   Serial.print("BWD Control on A1: ");
   Serial.println(bwdControl);
-  int treshold = 900;
+
   if(fwdControl > treshold && bwdControl > treshold){
     play();
   }
