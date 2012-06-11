@@ -1,0 +1,30 @@
+
+C Code Generation for CIP MACHINE mStarbotUnit in IMPLEMENTATION StarbotImpl of SYSTEM Starbot
+	June 12, 2012 12:31:39 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mStarbotUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Starbot
+
+generating Error Function Template Module for CIP MACHINE _errStarbotUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceStarbotUnit.tpl ...  complete
+generating header file for CIP MACHINE mStarbotUnit.h ...  complete
+generating CIP MACHINE module mStarbotUnit.c ...  complete
+generating error header file for CIP MACHINE eStarbotUnit.h ...  complete
+generating error module for CIP MACHINE eStarbotUnit.c ...  complete
+generating PROCESS module Attrack.c ...  complete
+generating PROCESS module Shine.c ...  complete
+generating PROCESS module Start.c ...  complete
+generating PROCESS module Track.c ...  complete
+generating trace header file for CIP MACHINE tStarbotUnit.h ...  complete
+generating trace module for CIP MACHINE tStarbotUnit.c ...  complete
+
+Code generation terminated
