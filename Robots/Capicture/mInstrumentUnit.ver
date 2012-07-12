@@ -1,0 +1,27 @@
+
+C Code Generation for CIP MACHINE mInstrumentUnit in IMPLEMENTATION InstrumentImpl of SYSTEM Instrument
+	July 12, 2012 9:11:09 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mInstrumentUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Capicture
+
+generating Error Function Template Module for CIP MACHINE _errInstrumentUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceInstrumentUnit.tpl ...  complete
+generating header file for CIP MACHINE mInstrumentUnit.h ...  complete
+generating CIP MACHINE module mInstrumentUnit.c ...  complete
+generating error header file for CIP MACHINE eInstrumentUnit.h ...  complete
+generating error module for CIP MACHINE eInstrumentUnit.c ...  complete
+generating PROCESS module Finger.c ...  complete
+generating trace header file for CIP MACHINE tInstrumentUnit.h ...  complete
+generating trace module for CIP MACHINE tInstrumentUnit.c ...  complete
+
+Code generation terminated

@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sInstrumentUnit in IMPLEMENTATION InstrumentImpl of SYSTEM Instrument
+	July 12, 2012 9:11:08 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sInstrumentUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Capicture
+
+generating CIP Connector Template Module for CIP SHELL _conInstrumentUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sInstrumentUnit.h ...  complete
+generating CIP SHELL module sInstrumentUnit.c ...  complete
+
+Code generation terminated
