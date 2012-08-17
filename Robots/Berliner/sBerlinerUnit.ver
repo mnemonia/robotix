@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sBerlinerUnit in IMPLEMENTATION Arduino of SYSTEM Berliner
+	August 17, 2012 4:31:38 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sBerlinerUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Berliner
+
+generating CIP Connector Template Module for CIP SHELL _conBerlinerUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sBerlinerUnit.h ...  complete
+generating CIP SHELL module sBerlinerUnit.c ...  complete
+
+Code generation terminated

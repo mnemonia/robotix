@@ -1,0 +1,32 @@
+
+C Code Generation for CIP MACHINE mBerlinerUnit in IMPLEMENTATION Arduino of SYSTEM Berliner
+	August 17, 2012 4:31:41 am
+
+
+Errors
+	No Error
+
+Warnings
+
+	Warning for PROCESS Drive
+		untranslated INPULSE -> BackwardLeft; BackwardRight; 
+
+Verification of CIP MACHINE mBerlinerUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Berliner
+
+generating Error Function Template Module for CIP MACHINE _errBerlinerUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceBerlinerUnit.tpl ...  complete
+generating header file for CIP MACHINE mBerlinerUnit.h ...  complete
+generating CIP MACHINE module mBerlinerUnit.c ...  complete
+generating error header file for CIP MACHINE eBerlinerUnit.h ...  complete
+generating error module for CIP MACHINE eBerlinerUnit.c ...  complete
+generating PROCESS module Calibration.c ...  complete
+generating PROCESS module Drive.c ...  complete
+generating PROCESS module Motor.c ...  complete
+generating PROCESS module Steering.c ...  complete
+generating trace header file for CIP MACHINE tBerlinerUnit.h ...  complete
+generating trace module for CIP MACHINE tBerlinerUnit.c ...  complete
+
+Code generation terminated
