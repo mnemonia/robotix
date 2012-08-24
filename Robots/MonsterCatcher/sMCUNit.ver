@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sMCUNit in IMPLEMENTATION MCArduino of SYSTEM MonsterCatcher
+	August 23, 2012 9:16:04 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sMCUNit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\MonsterCatcher
+
+generating CIP Connector Template Module for CIP SHELL _conMCUNit.tpl ...  complete
+generating shell headerfile for CIP SHELL sMCUNit.h ...  complete
+generating CIP SHELL module sMCUNit.c ...  complete
+
+Code generation terminated

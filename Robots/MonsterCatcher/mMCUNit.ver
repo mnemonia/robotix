@@ -1,0 +1,35 @@
+
+C Code Generation for CIP MACHINE mMCUNit in IMPLEMENTATION MCArduino of SYSTEM MonsterCatcher
+	August 23, 2012 9:16:05 pm
+
+
+Errors
+	No Error
+
+Warnings
+
+	Warning for PROCESS Drive
+		untranslated INPULSE -> LEFT; 
+
+Verification of CIP MACHINE mMCUNit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\MonsterCatcher
+
+generating Error Function Template Module for CIP MACHINE _errMCUNit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceMCUNit.tpl ...  complete
+generating header file for CIP MACHINE mMCUNit.h ...  complete
+generating CIP MACHINE module mMCUNit.c ...  complete
+generating error header file for CIP MACHINE eMCUNit.h ...  complete
+generating error module for CIP MACHINE eMCUNit.c ...  complete
+generating PROCESS module Avoid.c ...  complete
+generating PROCESS module BedDetector.c ...  complete
+generating PROCESS module Catcher.c ...  complete
+generating PROCESS module Drive.c ...  complete
+generating PROCESS module DrunkDrive.c ...  complete
+generating PROCESS module Finder.c ...  complete
+generating PROCESS module Wander.c ...  complete
+generating trace header file for CIP MACHINE tMCUNit.h ...  complete
+generating trace module for CIP MACHINE tMCUNit.c ...  complete
+
+Code generation terminated
