@@ -252,7 +252,7 @@ void bumpBehavior(){
 
 boolean isUnderBed(){
   int distance = ultrasonic.Ranging(CM);
-  boolean isBedAbove = distance > 0 && distance < 30;
+  boolean isBedAbove = distance > 0 && distance < 90;
   Serial.print("Bed is above: ");
   Serial.print(isBedAbove ? "yes, " : "no, ");
   Serial.println(distance);
