@@ -17,8 +17,8 @@ int currentState = C6_CLEAR;
 
 Servo wingLeftServo;
 Servo wingRightServo;
-const int wingBottomAngle = 60;
-const int wingTopAngle = 140;
+const int wingBottomAngle = 70;
+const int wingTopAngle = 130;
 const int wingCenterAngle = 90;
  
 int pos = 0;    // variable to store the servo position 
@@ -32,8 +32,6 @@ void setup()
 { 
   Serial.begin(9600);
   
-  tone(speakerPin,440,4);
-
   pinMode(eyeLed, OUTPUT);     
   pinMode(mouthLed, OUTPUT);
   pinMode(wingLed, OUTPUT);
@@ -43,8 +41,6 @@ void setup()
 
   wingLeftServo.write(wingCenterAngle);  // attaches the servo on pin 9 to the servo object 
   wingRightServo.write(wingCenterAngle);  // attaches the servo on pin 9 to the servo object 
-
-  noTone(speakerPin);
   
   if (fINIT_())
   {
@@ -70,27 +66,6 @@ void loop()
     previousMillis = currentMillis; 
    incrementTime();
   }  
-/*  
-  int noteDuration = ultrasonic.Ranging(CM);
-  tone(speakerPin,440,noteDuration);
-  delay(noteDuration * 1.3);
-  noTone(speakerPin);
-  
-  digitalWrite(eyeLed, HIGH);   // turn the LED on (HIGH is the voltage level)
-  for(pos = 60; pos < 140; pos += 1)  // goes from 0 degrees to 180 degrees 
-  {                                  // in steps of 1 degree 
-    wingLeftServo.write(pos);              // tell servo to go to position in variable 'pos' 
-    wingRightServo.write(pos);              // tell servo to go to position in variable 'pos' 
-    delay(15);                       // waits 15ms for the servo to reach the position 
-  } 
-  digitalWrite(eyeLed, LOW);    // turn the LED off by making the voltage LOW
-  for(pos = 140; pos>=60; pos-=1)     // goes from 180 degrees to 0 degrees 
-  {                                
-    wingLeftServo.write(pos);              // tell servo to go to position in variable 'pos' 
-    wingRightServo.write(pos);              // tell servo to go to position in variable 'pos' 
-    delay(15);                       // waits 15ms for the servo to reach the position 
-  } 
-  */
 } 
 
 void incrementTime(){
