@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sBoesewicht in IMPLEMENTATION ArduinoImplementation of SYSTEM Boesewicht
+	September 11, 2012 9:33:02 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sBoesewicht terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Boesewicht
+
+generating CIP Connector Template Module for CIP SHELL _conBoesewicht.tpl ...  complete
+generating shell headerfile for CIP SHELL sBoesewicht.h ...  complete
+generating CIP SHELL module sBoesewicht.c ...  complete
+
+Code generation terminated

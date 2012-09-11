@@ -1,0 +1,33 @@
+
+C Code Generation for CIP MACHINE mBoesewicht in IMPLEMENTATION ArduinoImplementation of SYSTEM Boesewicht
+	September 11, 2012 9:33:04 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mBoesewicht terminated
+
+
+Directory for C code files: c:\_ws\robotix\Robots\Boesewicht
+
+generating Error Function Template Module for CIP MACHINE _errBoesewicht.tpl ...  complete
+generating trace template file for CIP MACHINE _traceBoesewicht.tpl ...  complete
+generating header file for CIP MACHINE mBoesewicht.h ...  complete
+generating CIP MACHINE module mBoesewicht.c ...  complete
+generating error header file for CIP MACHINE eBoesewicht.h ...  complete
+generating error module for CIP MACHINE eBoesewicht.c ...  complete
+generating PROCESS module Controller.c ...  complete
+generating PROCESS module Eyes.c ...  complete
+generating PROCESS module Initialize.c ...  complete
+generating PROCESS module Mouth.c ...  complete
+generating PROCESS module WaveWings.c ...  complete
+generating PROCESS module WingLeft.c ...  complete
+generating PROCESS module WingRight.c ...  complete
+generating trace header file for CIP MACHINE tBoesewicht.h ...  complete
+generating trace module for CIP MACHINE tBoesewicht.c ...  complete
+
+Code generation terminated
