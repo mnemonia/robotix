@@ -20,11 +20,14 @@ void setup()
 { 
   Serial.begin(9600);
   pinMode(6,OUTPUT);
+  pinMode(7,OUTPUT);
   pinMode(12,OUTPUT);
   pinMode(13,OUTPUT);
   leftServo.attach(9);  // attaches the servo on pin 9 to the servo object 
   rightServo.attach(10);  // attaches the servo on pin 9 to the servo object 
   randomSeed(analogRead(A0));
+  digitalWrite(7,LOW);
+  
 } 
  
 void loop() 
@@ -58,22 +61,17 @@ void loop()
     digitalWrite(13,LOW);
   }
   
-  if(isDanger(distance)){
-    int noteDuration = distance>0 ? 1000/distance : 100;
-    tone(8, random(1, 20) * distance + 10, noteDuration);
 
-    // to distinguish the notes, set a minimum time between them.
-    // the note's duration + 30% seems to work well:
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    // stop the tone playing:
-    noTone(8);
+  if(isAttention(distance)){
+    digitalWrite(7,HIGH);
+  }else if(isDanger(distance)){
+    digitalWrite(7,HIGH);
+  }else if(isSomethingThere(distance)){
+    digitalWrite(7,LOW);
+  }else{
+    digitalWrite(7,LOW);
   }
   
-/*  Serial.print("#S|LOGTEST|[");
-  Serial.print(distance);
-  Serial.println("]#");*/
-  Serial.println(distance);
   
  // delay(30);                           // waits for the servo to get there 
 }
