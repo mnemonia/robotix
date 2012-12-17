@@ -1,72 +1,114 @@
-/*
-  Analog Input
- Demonstrates analog input by reading an analog sensor on analog pin 0 and
- turning on and off a light emitting diode(LED)  connected to digital pin 13. 
- The amount of time the LED will be on and off depends on
- the value obtained by analogRead(). 
- 
- The circuit:
- * Potentiometer attached to analog input 0
- * center pin of the potentiometer to the analog pin
- * one side pin (either one) to ground
- * the other side pin to +5V
- * LED anode (long leg) attached to digital output 13
- * LED cathode (short leg) attached to ground
- 
- * Note: because most Arduinos have a built-in LED attached 
- to pin 13 on the board, the LED is optional.
- 
- 
- Created by David Cuartielles
- modified 30 Aug 2011
- By Tom Igoe
- 
- This example code is in the public domain.
- 
- http://arduino.cc/en/Tutorial/AnalogInput
- 
- */
+const int upperLevelSensorPin = A1;
+const int lowerLevelSensorPin = A0;
+const int upperLevelActorPin = 5;
+const int lowerLevelActorPin = 6;
+const int onIndicatorPin = 4;
+const int runningPumpIndicatorPin = 3;
+const int notRunningPumpIndicatorPin = 2;
+int upperLevelSensorValue = 0;
+int lowerLevelSensorValue = 0;
 
-int sensorPin = A0;    // select the input pin for the potentiometer
-int actorPin = 2;    // select the input pin for the potentiometer
-int ledPin = 13;      // select the pin for the LED
-int sensorValue = 0;  // variable to store the value coming from the sensor
+//
+boolean isPumping = false;
 
-// motor B
-int dir1PinB = 11;
-int dir2PinB = 8;
-int speedPinB = 9;
-int speed = 255;
+// Pump Settings
+const int pumpFwdDirectionPin = 8;//11;
+const int pumpBwdDirectionPin = 11;
+const int pumpSpeedPin = 9;
+const int pumpSpeed = 255;
+
+const int waterIndicatorValue = 25;
 
 void setup() {
   Serial.begin(9600);
   // declare the ledPin as an OUTPUT:
-  pinMode(ledPin, OUTPUT);  
-  pinMode(actorPin, OUTPUT);
+  init(onIndicatorPin);
+  init(runningPumpIndicatorPin);
+  init(notRunningPumpIndicatorPin);
 
-  pinMode(dir1PinB, OUTPUT);
-  pinMode(dir2PinB, OUTPUT);
-  pinMode(speedPinB, OUTPUT);
-  analogWrite(speedPinB, speed);
+
+  init(upperLevelActorPin);
+  init(lowerLevelActorPin);
+
+  init(pumpFwdDirectionPin);
+  init(pumpBwdDirectionPin);
+  init(pumpSpeedPin);
+
+  on(onIndicatorPin);
+  off(runningPumpIndicatorPin);
+  off(notRunningPumpIndicatorPin);
 }
 
 void loop() {
-  // read the value from the sensor:
-  digitalWrite(actorPin,HIGH);
-  sensorValue = analogRead(sensorPin);    
-  digitalWrite(actorPin,LOW);
-  Serial.println(sensorValue);
-  if(sensorValue>4){
-    // turn the ledPin on
-    digitalWrite(ledPin, HIGH);  
-    digitalWrite(dir1PinB, HIGH);
-    digitalWrite(dir2PinB, LOW);
-  }else{
-    // turn the ledPin off:        
-    digitalWrite(ledPin, LOW);   
-    digitalWrite(dir1PinB, LOW);
-    digitalWrite(dir2PinB, LOW);
+  if(isPumping){
+    if(isEmpty()){
+      stopPump();
+    }
   }
-  // stop the program for for <sensorValue> milliseconds:
-  delay(500);                  
+  
+  if(!isPumping){
+    if(isNeedPump()){
+      startPump();
+    }
+  }
+
+  debug();
+  delay(2000);
 }
+
+boolean isEmpty(){
+  // read the value from the sensor:
+  on(lowerLevelActorPin);
+  delay(20);
+  lowerLevelSensorValue = analogRead(lowerLevelSensorPin);    
+  off(lowerLevelActorPin);
+  return lowerLevelSensorValue < waterIndicatorValue;
+}
+
+void debug(){
+  Serial.print("Upper Level Sensor Value: ");
+  Serial.println(upperLevelSensorValue);
+  Serial.print("Lower Level Sensor Value: ");
+  Serial.println(lowerLevelSensorValue);
+}
+
+boolean isNeedPump(){
+  // read the value from the sensor:
+  on(upperLevelActorPin);
+  delay(20);
+  upperLevelSensorValue = analogRead(upperLevelSensorPin);    
+  off(upperLevelActorPin);
+
+  return upperLevelSensorValue > waterIndicatorValue;
+}
+
+void startPump(){
+  isPumping = true;
+  on(runningPumpIndicatorPin);
+  off(notRunningPumpIndicatorPin);  
+  analogWrite(pumpSpeedPin, pumpSpeed);
+  on(pumpFwdDirectionPin);
+  off(pumpBwdDirectionPin);
+}
+
+void stopPump(){
+  isPumping = false;
+  off(runningPumpIndicatorPin);
+  on(notRunningPumpIndicatorPin);  
+  analogWrite(pumpSpeedPin, 0);
+  off(pumpFwdDirectionPin);
+  off(pumpBwdDirectionPin);
+}
+
+void on(int pin){
+  digitalWrite(pin,HIGH);
+}
+
+void off(int pin){
+  digitalWrite(pin,LOW);
+}
+
+void init(int pin){
+  pinMode(pin,OUTPUT);
+}
+
