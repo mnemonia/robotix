@@ -1,0 +1,30 @@
+
+C Code Generation for CIP MACHINE mCondensedWaterPumpUnit in IMPLEMENTATION CondensedWaterPumpImpl of SYSTEM CondensedWaterPump
+	December 18, 2012 8:00:08 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mCondensedWaterPumpUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Home\CondensedWaterPump
+
+generating Error Function Template Module for CIP MACHINE _errCondensedWaterPumpUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceCondensedWaterPumpUnit.tpl ...  complete
+generating header file for CIP MACHINE mCondensedWaterPumpUnit.h ...  complete
+generating CIP MACHINE module mCondensedWaterPumpUnit.c ...  complete
+generating error header file for CIP MACHINE eCondensedWaterPumpUnit.h ...  complete
+generating error module for CIP MACHINE eCondensedWaterPumpUnit.c ...  complete
+generating PROCESS module LowerLevelSensor.c ...  complete
+generating PROCESS module Pump.c ...  complete
+generating PROCESS module ThreeStepController.c ...  complete
+generating PROCESS module UpperLevelSensor.c ...  complete
+generating trace header file for CIP MACHINE tCondensedWaterPumpUnit.h ...  complete
+generating trace module for CIP MACHINE tCondensedWaterPumpUnit.c ...  complete
+
+Code generation terminated

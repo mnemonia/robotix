@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sCondensedWaterPumpUnit in IMPLEMENTATION CondensedWaterPumpImpl of SYSTEM CondensedWaterPump
+	December 18, 2012 8:00:06 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sCondensedWaterPumpUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Home\CondensedWaterPump
+
+generating CIP Connector Template Module for CIP SHELL _conCondensedWaterPumpUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sCondensedWaterPumpUnit.h ...  complete
+generating CIP SHELL module sCondensedWaterPumpUnit.c ...  complete
+
+Code generation terminated
