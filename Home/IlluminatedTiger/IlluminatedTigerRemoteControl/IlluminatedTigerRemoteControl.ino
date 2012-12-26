@@ -13,23 +13,48 @@
 #undef double
 #undef float
 #undef round
+
+const int upperCenterStatePin = 7;
+int upperCenterState = LOW;
+
 void setup()
 {
-    Serial.begin(9600);	  // Debugging only
-    Serial.println("setup");
+  Serial.begin(9600);	  // Debugging only
+  Serial.println("setup");
 
-    // Initialise the IO and ISR
-    vw_set_ptt_inverted(true); // Required for DR3100
-    vw_setup(2000);	 // Bits per sec
+  pinMode(upperCenterStatePin, INPUT); 
+
+  // Initialise the IO and ISR
+  vw_set_ptt_inverted(true); // Required for DR3100
+  vw_setup(2000);	 // Bits per sec
 }
 
 void loop()
 {
-    const char *msg = "LMR";
-    digitalWrite(13, true); // Flash a light to show transmitting
-    delay(150);
-    vw_send((uint8_t *)msg, strlen(msg));
-    vw_wait_tx(); // Wait until the whole message is gone
-    digitalWrite(13, false);
-    delay(100000);
+  int newUpperCenterState = digitalRead(upperCenterStatePin);
+  Serial.println(upperCenterState);
+
+  if(hasChanged(newUpperCenterState, upperCenterState)){
+    upperCenterState = newUpperCenterState;
+    if (upperCenterState == HIGH) {     
+      transmit("UpperCenterOn");
+    } 
+    else {
+      transmit("UpperCenterOff");
+    }
+  }
+
+  delay(50);
 }
+void transmit(char *msg){
+  digitalWrite(13, true); // Flash a light to show transmitting
+  delay(150);
+  vw_send((uint8_t *)msg, strlen(msg));
+  vw_wait_tx(); // Wait until the whole message is gone
+  digitalWrite(13, false);
+}
+
+boolean hasChanged(int newState, int oldState){
+  return newState != oldState;
+}
+
