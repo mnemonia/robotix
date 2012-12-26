@@ -1,3 +1,6 @@
+extern "C"{
+#include "sTheUnit.h"
+}
 //
 // Simple example of how to use VirtualWire to receive messages
 // Implements a simplex (one-way) receiver with an Rx-B1 module
@@ -23,6 +26,10 @@ void setup()
     vw_setup(2000);	 // Bits per sec
 
     vw_rx_start();       // Start the receiver PLL running
+    
+      if(!fINIT_()){
+    // Fehler in fININT ...
+  }
 }
 
 void loop()
@@ -34,7 +41,7 @@ void loop()
     {
 	int i;
 
-        digitalWrite(13, true); // Flash a light to show received good message
+        //digitalWrite(13, true); // Flash a light to show received good message
 	// Message with a good checksum received, dump it.
 	Serial.print("Got: ");
 	
@@ -44,6 +51,60 @@ void loop()
 	    Serial.print(" ");
 	}
 	Serial.println("");
-        digitalWrite(13, false);
+        IN_.CommandChannel(C1_UPPER_CENTER_ON);
+
+        //digitalWrite(13, false);
     }
 }
+
+
+extern "C" {
+
+/*********************************************************************
+	User defined Output Channel Functions
+*********************************************************************/
+
+/* Output Channel Functions,
+	called by CIP Machine when a Message is written.
+	User defined function, with name to consider as suggestion */
+
+/* Parameters
+	name_		name value of message */
+
+void uCHAN_UpperCenterLightChan (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C2_OFF:
+                digitalWrite(13,LOW);
+		break;
+	case C2_ON:
+                digitalWrite(13,HIGH);
+		break;
+	default: 
+		break;
+	}
+}
+
+
+/*********************************************************************
+	User defined Output Channel Interface Initialization Function
+*********************************************************************/
+
+void iCHAN_(void)
+{
+		/* Initializing Input Error Function only if Input Error Option set */
+
+	#ifdef _EINPUT__
+		IN_.EINPUT_ = uEINPUT_;
+	#endif 
+
+		/* Initializing Output Interface */
+
+	OUT_.UpperCenterLightChan = uCHAN_UpperCenterLightChan;
+}
+
+}// extern "C"
+
+

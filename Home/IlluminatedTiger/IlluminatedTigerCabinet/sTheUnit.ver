@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sTheUnit in IMPLEMENTATION IlluminatedTigerCabImp of SYSTEM IlluminatedTigerCabinet
+	December 26, 2012 12:42:35 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sTheUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Home\IlluminatedTiger\IlluminatedTigerCabinet
+
+generating CIP Connector Template Module for CIP SHELL _conTheUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sTheUnit.h ...  complete
+generating CIP SHELL module sTheUnit.c ...  complete
+
+Code generation terminated
