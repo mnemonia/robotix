@@ -44,7 +44,7 @@ void loop()
     }
   }
 
-  delay(50);
+  delay(20);
 }
 void transmit(char *msg){
   digitalWrite(13, true); // Flash a light to show transmitting

@@ -16,11 +16,22 @@ extern "C"{
 #undef double
 #undef float
 #undef round
+
+int yellow = 5;
+int red = 6;
+int green = 7;
+int white = 13;
+
 void setup()
 {
   Serial.begin(9600);	// Debugging only
   Serial.println("setup");
-  pinMode(13, OUTPUT); 
+  
+  init(yellow);
+  init(red);
+  init(green);  
+  init(white);  
+  
   // Initialise the IO and ISR
   vw_set_ptt_inverted(true); // Required for DR3100
   vw_setup(2000);	 // Bits per sec
@@ -70,6 +81,28 @@ void loop()
   }
 }
 
+void init(int pin){
+  pinMode(pin, OUTPUT);     
+}
+void on(int pin){
+  digitalWrite(pin, HIGH);
+}
+void off(int pin){
+  digitalWrite(pin, LOW);
+}
+void on(){
+  on(yellow);
+  on(red);
+  on(green);  
+  on(white);
+}
+void off(){
+  off(yellow);
+  off(red);
+  off(green);  
+  off(white);
+}
+
 
 extern "C" {
 
@@ -90,10 +123,10 @@ extern "C" {
     switch (name_)
     {
     case C2_OFF:
-      digitalWrite(13,LOW);
+      off();
       break;
     case C2_ON:
-      digitalWrite(13,HIGH);
+      on();
       break;
     default: 
       break;
