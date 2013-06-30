@@ -1,3 +1,8 @@
+#include "CabinetCellLight.h"
+
+CabinetCellLight light3(3);
+CabinetCellLight light5(5);
+
 const int fadeSpeed = 150;
 // constants won't change. They're used here to 
 // set pin numbers:
@@ -10,14 +15,23 @@ int buttonState = 0;         // variable for reading the pushbutton status
 boolean isOn = false;
 void setup() {
   // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);      
+//  pinMode(ledPin, OUTPUT);      
   pinMode(indicatorPin, OUTPUT);      
   
   // initialize the pushbutton pin as an input:
-  pinMode(buttonPin, INPUT);     
+//  pinMode(buttonPin, INPUT);     
 }
 
 void loop(){
+  light3.fadeIn();
+  light5.fadeIn();  
+  delay(500);
+  light3.fadeOut();
+  light5.fadeOut();  
+  delay(500);
+  if(true) {
+  return;
+  } 
   // read the state of the pushbutton value:
   buttonState = digitalRead(buttonPin);
 
