@@ -1,0 +1,46 @@
+
+
+Verification of CIP UNIT CabinetLightController of SYSTEM CabinetLightController
+	June 30, 2013 11:58:48 pm
+
+CIP SHELL sCabinetLightController
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sCabinetLightController terminated
+
+
+CIP MACHINE mCabinetLightController
+
+Errors
+
+	Errors in CIP MACHINE mCabinetLightController
+
+	Errors in PROCESS Cabinet -> no valid Mode contained
+
+	Errors in PROCESS CabinetCell -> no Mode contained
+
+Warnings
+
+	Warning for CLUSTER LightController
+		PULSE CAST from PROCESS CabinetLight to PROCESS LightBehavior
+			TRANSLATION OUTPULSE TurnOff to INPULSE TurnOff --> unused OUTPULSE
+			TRANSLATION OUTPULSE TurnOn to INPULSE TurnOn --> unused OUTPULSE
+
+	Warning for PROCESS CabinetDoor
+		untranslated OUTPULSE -> CLOSED; OPEN; 
+		non interacting OUTPULSE -> CLOSED; OPEN; 
+
+	Warning for PROCESS CabinetLight
+		MODE normal incomplete ->  TRANSITIONS 3; 4; 
+
+	Warning for PROCESS LightFadeInBehavior
+		undefined OPERATION -> IncrementFadeInCounter; 
+		undefined DELAY -> FadeInTimeoutInTicks; 
+		MODE normal incomplete ->  TRANSITIONS 1; 
+
+Verification of CIP MACHINE mCabinetLightController terminated

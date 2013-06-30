@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sCabinetLightController in IMPLEMENTATION Arduino of SYSTEM CabinetLightController
+	July 1, 2013 12:00:04 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sCabinetLightController terminated
+
+
+Directory for C code files: c:\_ws\robotix\Home\CabinetLightController
+
+generating CIP Connector Template Module for CIP SHELL _conCabinetLightController.tpl ...  complete
+generating shell headerfile for CIP SHELL sCabinetLightController.h ...  complete
+generating CIP SHELL module sCabinetLightController.c ...  complete
+
+Code generation terminated
