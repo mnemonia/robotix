@@ -1,6 +1,6 @@
-int steps[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-int stepCount = 12;
-boolean allTogether = false;
+int steps[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 44, 45};
+int stepCount = 14;
+boolean allTogether = true;
 
 void setup()  {
   initializeLights();
@@ -37,7 +37,7 @@ void out(int pin){
 void loop(){;}
 
 void fadeTopDownAndBottomUpAndMeetInTheMiddle(){
-  for(int i=0, j=stepCount-1; i<=j; i++,j--){
+  for(int i=0, j=stepCount-1; i<j; i++,j--){
     fadeTwoSteps(i,j);
   }
 }
