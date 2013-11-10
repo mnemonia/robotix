@@ -1,31 +1,7 @@
-/*
-  Button
- 
- Turns on and off a light emitting diode(LED) connected to digital  
- pin 13, when pressing a pushbutton attached to pin 2. 
- 
- 
- The circuit:
- * LED attached from pin 13 to ground 
- * pushbutton attached to pin 2 from +5V
- * 10K resistor attached to pin 2 from ground
- 
- * Note: on most Arduinos there is already an LED on the board
- attached to pin 13.
- 
- 
- created 2005
- by DojoDave <http://www.0j0.org>
- modified 30 Aug 2011
- by Tom Igoe
- 
- This example code is in the public domain.
- 
- http://www.arduino.cc/en/Tutorial/Button
- */
+extern "C" {
+  #include "sArduinoUnit.h"
+}
 
-// constants won't change. They're used here to 
-// set pin numbers:
 const int lightTriggerPin = 7;     // the number of the pushbutton pin
 const int bellTriggerPin = 8;     // the number of the pushbutton pin
 const int ledPin =  13;      // the number of the LED pin
@@ -67,6 +43,23 @@ void setup() {
   digitalWrite(lightPin, LOW); 
   
   setupPir();
+  
+  
+  /*********************************************************************
+  	Execution of CIP Connector Activities
+  *********************************************************************/
+  
+  	/* Initializing CIP Machine */
+  
+  if (fINIT_())
+  {
+  	/* activation of drive loop */
+  }
+  else 
+  {
+  	/* initialization failed, abort drive */
+  }
+  
 }
 
 void setupPir(){
@@ -92,16 +85,15 @@ void loop(){
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
   if (lightTriggerState == HIGH) {     
-    // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
-    digitalWrite(lightPin, HIGH);  
+    IN_.LightSwitchInChannel(C1_DOWN);
   } 
   else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW); 
-    digitalWrite(lightPin, LOW); 
+    IN_.LightSwitchInChannel(C1_UP);    
   }
+  
+  delay(25);
 
+/*
   // read the state of the pushbutton value:
   bellTriggerState = digitalRead(bellTriggerPin);
 
@@ -119,6 +111,7 @@ void loop(){
   }
 
 loopPir();
+*/
 }
 
 void loopPir(){
@@ -158,3 +151,55 @@ void loopPir(){
            }
        }
   }
+  
+  
+  extern "C" {
+  /*********************************************************************
+	User defined Output Channel Functions
+*********************************************************************/
+
+/* Output Channel Functions,
+	called by CIP Machine when a Message is written.
+	User defined function, with name to consider as suggestion */
+
+/* Parameters
+	name_		name value of message */
+
+void uCHAN_LightOutChannel (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C2_OFF:
+                digitalWrite(ledPin, HIGH);  
+                digitalWrite(lightPin, HIGH);  
+		break;
+	case C2_ON:
+                digitalWrite(ledPin, LOW);  
+                digitalWrite(lightPin, LOW);  
+		break;
+	default: 
+		break;
+	}
+}
+
+
+/*********************************************************************
+	User defined Output Channel Interface Initialization Function
+*********************************************************************/
+
+void iCHAN_(void)
+{
+		/* Initializing Input Error Function only if Input Error Option set */
+
+	#ifdef _EINPUT__
+		IN_.EINPUT_ = uEINPUT_;
+	#endif 
+
+		/* Initializing Output Interface */
+
+	OUT_.LightOutChannel = uCHAN_LightOutChannel;
+}
+
+
+}

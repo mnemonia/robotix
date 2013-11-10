@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sArduinoUnit in IMPLEMENTATION ArduinoImplementation of SYSTEM FrontDoor
+	November 10, 2013 8:45:09 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sArduinoUnit terminated
+
+
+Directory for C code files: c:\_ws\robotix\Home\FrontDoor
+
+generating CIP Connector Template Module for CIP SHELL _conArduinoUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sArduinoUnit.h ...  complete
+generating CIP SHELL module sArduinoUnit.c ...  complete
+
+Code generation terminated
