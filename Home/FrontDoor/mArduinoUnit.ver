@@ -1,6 +1,6 @@
 
 C Code Generation for CIP MACHINE mArduinoUnit in IMPLEMENTATION ArduinoImplementation of SYSTEM FrontDoor
-	November 10, 2013 8:45:11 pm
+	November 10, 2013 9:40:44 pm
 
 
 Errors
@@ -23,6 +23,8 @@ generating header file for CIP MACHINE mArduinoUnit.h ...  complete
 generating CIP MACHINE module mArduinoUnit.c ...  complete
 generating error header file for CIP MACHINE eArduinoUnit.h ...  complete
 generating error module for CIP MACHINE eArduinoUnit.c ...  complete
+generating PROCESS module Bell.c ...  complete
+generating PROCESS module BellSwitch.c ...  complete
 generating PROCESS module Light.c ...  complete
 generating PROCESS module LightSwitch.c ...  complete
 generating trace header file for CIP MACHINE tArduinoUnit.h ...  complete

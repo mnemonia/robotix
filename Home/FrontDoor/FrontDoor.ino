@@ -8,6 +8,11 @@ const int ledPin =  13;      // the number of the LED pin
 const int lightPin = 3;      // the number of the LED pin
 const int bellPin = 5;      // the number of the LED pin
 const int pirPin = 2;
+
+long currentMillies = 0L;
+long previousMillis = 0L;
+long interval = 20L;  
+
 /////////////////////////////
 //VARS
 //the time we give the sensor to calibrate (10-60 secs according to the datasheet)
@@ -42,7 +47,7 @@ void setup() {
   digitalWrite(ledPin, LOW); 
   digitalWrite(lightPin, LOW); 
   
-  setupPir();
+//  setupPir();
   
   
   /*********************************************************************
@@ -91,27 +96,40 @@ void loop(){
     IN_.LightSwitchInChannel(C1_UP);    
   }
   
-  delay(25);
+//  delay(25);
 
-/*
+
   // read the state of the pushbutton value:
   bellTriggerState = digitalRead(bellTriggerPin);
 
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
   if (bellTriggerState == HIGH) {     
-    // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
-    digitalWrite(bellPin, HIGH);  
+    IN_.BellInChannel(C3_DOWN);
   } 
   else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW); 
-    digitalWrite(bellPin, LOW); 
+    // IN_.BellInChannel(C3_SWITCH);
   }
 
-loopPir();
-*/
+  unsigned long currentMillis = millis();
+
+  if(currentMillis - previousMillis > interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis; 
+    incrementTime();
+  }  
+
+//loopPir();
+
+}
+
+void incrementTime(){
+  //  int sensorValue = analogRead(sensorPin);    
+
+  TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
+
+  while (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
+  //  Serial.println("TICK");
 }
 
 void loopPir(){
@@ -162,8 +180,23 @@ void loopPir(){
 	called by CIP Machine when a Message is written.
 	User defined function, with name to consider as suggestion */
 
-/* Parameters
-	name_		name value of message */
+void uCHAN_BellOutChannel (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C4_OFF:
+                digitalWrite(ledPin, LOW);  
+                digitalWrite(bellPin, LOW);  
+		break;
+	case C4_ON:
+                digitalWrite(ledPin, HIGH);  
+                digitalWrite(bellPin, HIGH);  
+		break;
+	default: 
+		break;
+	}
+}
 
 void uCHAN_LightOutChannel (unsigned char name_)
 {
@@ -171,12 +204,12 @@ void uCHAN_LightOutChannel (unsigned char name_)
 	switch (name_)
 	{
 	case C2_OFF:
-                digitalWrite(ledPin, HIGH);  
-                digitalWrite(lightPin, HIGH);  
-		break;
-	case C2_ON:
                 digitalWrite(ledPin, LOW);  
                 digitalWrite(lightPin, LOW);  
+		break;
+	case C2_ON:
+                digitalWrite(ledPin, HIGH);  
+                digitalWrite(lightPin, HIGH);  
 		break;
 	default: 
 		break;
@@ -198,6 +231,7 @@ void iCHAN_(void)
 
 		/* Initializing Output Interface */
 
+	OUT_.BellOutChannel = uCHAN_BellOutChannel;
 	OUT_.LightOutChannel = uCHAN_LightOutChannel;
 }
 
