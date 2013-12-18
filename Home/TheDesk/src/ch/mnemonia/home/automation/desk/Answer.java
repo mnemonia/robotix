@@ -8,6 +8,9 @@ public class Answer {
 
 	Answer(){
         VoiceManager voiceManager = VoiceManager.getInstance();
+        for (Voice voice : voiceManager.getVoices()){
+        	System.out.println(voice.getName());
+        }
         helloVoice = voiceManager.getVoice("kevin16");
         
         /* Allocates the resources for the voice.

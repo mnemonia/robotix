@@ -6,4 +6,4 @@
 
 grammar desk;
 
-public <greet> = (Desk) ( Lights Off | Lights On );
+public <greet> = (Desk) ( Turn Lights Off | Turn Lights On | Dim Lights | Sleep | Hello | Goodbye | Thank You );
