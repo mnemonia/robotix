@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DoorBellHttpService
+Bundle-SymbolicName: DoorBellHttpService
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.mnemonia.home.automation.service.frontdoor.bell.http.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.framework

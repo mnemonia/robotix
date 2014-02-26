@@ -68,7 +68,6 @@ void setup() {
 }
 
 void setupPir(){
-  Serial.begin(9600);
   pinMode(pirPin, INPUT);
   digitalWrite(pirPin, LOW);
 

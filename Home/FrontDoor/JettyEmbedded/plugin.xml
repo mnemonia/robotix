@@ -1,0 +1,10 @@
+<plugin>
+	<extension point="org.eclipse.equinox.http.registry.servlets">
+	  <!--  <servlet
+	      alias="/a"
+	      class="com.netstal.service.automationinterface.http.AutomationServlet"/>  -->
+	    <servlet
+	      alias="/websocket"
+	      class="websocketservlettest.EchoServer"/>
+	</extension>  
+</plugin>
