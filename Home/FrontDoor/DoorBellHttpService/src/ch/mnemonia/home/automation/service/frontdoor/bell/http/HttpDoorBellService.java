@@ -30,7 +30,6 @@ public final class HttpDoorBellService extends HttpServlet {
 		DoorBellService doorBellService = bundleContext.getService(serviceReference);
 		doorBellService.ring();
 		printWriter.println(" done.");
-
 	}
 
 }

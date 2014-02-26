@@ -5,7 +5,8 @@ Bundle-SymbolicName: DoorBellService
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.mnemonia.house.automation.service.bell.internal.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.osgi.framework
+Import-Package: javax.sound.sampled,
+ org.osgi.framework
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: META-INF/lib/jl1.0.1.jar,
  .
