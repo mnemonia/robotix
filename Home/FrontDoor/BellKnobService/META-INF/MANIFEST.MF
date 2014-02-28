@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BellKnobService
+Bundle-SymbolicName: BellKnobService
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.mnemonia.automation.home.door.service.bellknob.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: ch.mnemonia.house.automation.service.bell,
+ com.pi4j.io.gpio.service,
+ org.osgi.framework;version="1.3.0"
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: META-INF/lib/pi4j-core.jar,
+ META-INF/lib/pi4j-device.jar,
+ META-INF/lib/pi4j-gpio-extension.jar,
+ META-INF/lib/pi4j-service.jar,
+ .
