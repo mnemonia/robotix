@@ -28,10 +28,70 @@ package com.pi4j.io.gpio.service.impl;
  */
 
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.pi4j.io.gpio.impl.GpioControllerImpl;
 import com.pi4j.io.gpio.service.GpioService;
+import com.pi4j.io.gpio.service.PinListener;
 
 public class GpioServiceImpl extends GpioControllerImpl implements GpioService
 {
+	final GpioController gpio = GpioFactory.getInstance();
+	
+	public void start(){
+	}
+    public void stop(){
+        // stop all GPIO activity/threads by shutting down the GPIO controller
+        // (this method will forcefully shutdown all GPIO monitoring threads and scheduled tasks)
+        gpio.shutdown();           
+    }
 
+	@Override
+	public void addPinListener(Pin pin, PinListener pinListener) {
+        System.out.println("<--Pi4J--> GPIO Listen Example ... started.");
+
+        // provision gpio pin #02 as an input pin with its internal pull down resistor enabled
+        final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_DOWN);
+
+        // create and register gpio pin listener
+        myButton.addListener(new GpioPinListenerDigitalAdapter(pinListener));
+        
+        System.out.println(" ... complete the GPIO "+pin+" circuit and see the listener feedback here in the console.");
+                
+        // stop all GPIO activity/threads by shutting down the GPIO controller
+        // (this method will forcefully shutdown all GPIO monitoring threads and scheduled tasks)
+        // gpio.shutdown();   <--- implement this method call if you wish to terminate the Pi4J GPIO controller        
+		
+	}
+    
+
+	private class GpioPinListenerDigitalAdapter implements GpioPinListenerDigital {
+		private final PinListener pinListener;
+		
+		GpioPinListenerDigitalAdapter(final PinListener pinListener){
+			this.pinListener = pinListener;
+		}
+		
+		@Override
+		public void handleGpioPinDigitalStateChangeEvent(
+				GpioPinDigitalStateChangeEvent event) {
+            System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
+			PinState state = event.getState();
+			switch(state){
+				case HIGH:
+					pinListener.pinHigh();
+					break;
+				case LOW:
+				default:
+					pinListener.pinLow();
+			}
+		}
+		
+	}
 }

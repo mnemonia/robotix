@@ -29,7 +29,9 @@ package com.pi4j.io.gpio.service;
 
 
 import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.Pin;
 
 public interface GpioService extends GpioController
 {
+	void addPinListener(Pin pin, PinListener pinListener);
 }

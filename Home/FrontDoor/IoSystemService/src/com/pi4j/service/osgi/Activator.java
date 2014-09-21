@@ -32,7 +32,8 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
+import org.osgi.service.log.LogService;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.pi4j.io.gpio.service.GpioService;
 import com.pi4j.io.gpio.service.impl.GpioServiceImpl;
@@ -43,24 +44,51 @@ import com.pi4j.system.service.impl.SystemInformationServiceImpl;
 
 public class Activator implements BundleActivator
 {
-    public void start(BundleContext bundleContext) throws Exception
+	private ServiceTracker<?, ?> logServiceTracker;
+	private LogService logService;
+	private GpioServiceImpl gpioServiceImpl;
+
+	public void start(BundleContext bundleContext) throws Exception
     {
-    	if(System.getProperty("os.name").startsWith("Windows")){
-    		System.out.println("GPIO Service is NOT running on Windows.");
-    		throw new BundleException("GPIO Service is NOT running on Windows");
-}
+	    // create a tracker and track the log service
+	    logServiceTracker = new ServiceTracker(bundleContext, LogService.class.getName(), null);
+	    logServiceTracker.open();
+
+	    // grab the service
+	    logService = (LogService) logServiceTracker.getService();
+
+	    if(logService != null){ 
+	        System.out.println("There is a LogService available"); 
+	        logService.log(LogService.LOG_INFO, "Yee ha, I'm logging!"); 
+		} 
+		else { 
+		        System.out.println("There is no LogService available"); 
+		        return;
+		}
+	    
+	    logService.log(LogService.LOG_INFO, "Starting IoSystemService ...");
+//    	if(System.getProperty("os.name").startsWith("Windows")){
+//    		System.out.println("GPIO Service is NOT running on Windows.");
+//    		throw new BundleException("GPIO Service is NOT running on Windows");
+//    	}
         // create OSGi bundle properties
     	Properties props = new Properties();
         props.put("Language", "English");
 
+        gpioServiceImpl = new GpioServiceImpl();
         // create a new GPIO service instance
         // and register services with OSGi
-        bundleContext.registerService(GpioService.class.getName(), new GpioServiceImpl(), null);
+        bundleContext.registerService(GpioService.class.getName(), gpioServiceImpl, null);
         bundleContext.registerService(SystemInformationService.class.getName(), new SystemInformationServiceImpl(), null);
         bundleContext.registerService(NetworkInformationService.class.getName(), new NetworkInformationServiceImpl(), null);        
+
+        gpioServiceImpl.start();
+        
+	    logService.log(LogService.LOG_INFO, "Starting IoSystemService DONE");
     }
 
     public void stop(BundleContext bundleContext) throws Exception
-    {        
+    {      
+    	gpioServiceImpl.stop();
     }
 }

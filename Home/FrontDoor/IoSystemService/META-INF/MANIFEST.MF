@@ -4,13 +4,16 @@ Bundle-Name: IoSystemService
 Bundle-SymbolicName: IoSystemService
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.pi4j.service.osgi.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.osgi.framework;version="1.3.0"
+Import-Package: org.osgi.framework;version="1.3.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.1"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: META-INF/lib/pi4j-core.jar,
  META-INF/lib/pi4j-device.jar,
  META-INF/lib/pi4j-gpio-extension.jar,
  META-INF/lib/pi4j-service.jar,
  .
-Export-Package: com.pi4j.io.gpio.service,
+Export-Package: com.pi4j.io.gpio,
+ com.pi4j.io.gpio.event,
+ com.pi4j.io.gpio.service,
  com.pi4j.system.service
