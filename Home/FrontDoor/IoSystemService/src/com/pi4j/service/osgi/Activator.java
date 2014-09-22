@@ -35,7 +35,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.pi4j.io.gpio.service.GpioService;
+import com.mnemonia.io.IoSystemService;
+import com.mnemonia.io.internal.IoSystemServiceImpl;
 import com.pi4j.io.gpio.service.impl.GpioServiceImpl;
 import com.pi4j.system.service.NetworkInformationService;
 import com.pi4j.system.service.SystemInformationService;
@@ -44,7 +45,7 @@ import com.pi4j.system.service.impl.SystemInformationServiceImpl;
 
 public class Activator implements BundleActivator
 {
-	private ServiceTracker<?, ?> logServiceTracker;
+	private ServiceTracker<?, LogService> logServiceTracker;
 	private LogService logService;
 	private GpioServiceImpl gpioServiceImpl;
 
@@ -55,7 +56,7 @@ public class Activator implements BundleActivator
 	    logServiceTracker.open();
 
 	    // grab the service
-	    logService = (LogService) logServiceTracker.getService();
+	    logService = logServiceTracker.getService();
 
 	    if(logService != null){ 
 	        System.out.println("There is a LogService available"); 
@@ -75,10 +76,11 @@ public class Activator implements BundleActivator
     	Properties props = new Properties();
         props.put("Language", "English");
 
-        gpioServiceImpl = new GpioServiceImpl();
+        gpioServiceImpl = new GpioServiceImpl(logService);
+        
         // create a new GPIO service instance
         // and register services with OSGi
-        bundleContext.registerService(GpioService.class.getName(), gpioServiceImpl, null);
+        bundleContext.registerService(IoSystemService.class.getName(), new IoSystemServiceImpl(gpioServiceImpl), null);
         bundleContext.registerService(SystemInformationService.class.getName(), new SystemInformationServiceImpl(), null);
         bundleContext.registerService(NetworkInformationService.class.getName(), new NetworkInformationServiceImpl(), null);        
 
@@ -90,5 +92,6 @@ public class Activator implements BundleActivator
     public void stop(BundleContext bundleContext) throws Exception
     {      
     	gpioServiceImpl.stop();
+    	logServiceTracker.close();
     }
 }
