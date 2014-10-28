@@ -18,17 +18,19 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 #define MAX9744_I2CADDR 0x4B
 #define SOUND_ON_STANDARD_VALUE 50
 #define SOUND_OFF_STANDARD_VALUE 0
+#define SOUND_MAX_VALUE 63
 #define SOUND_DIM_DELAY 50
 #define SOUND_ON_OFF_DELAY 1000
 #define SOUND_DIM_STEP 2
 
 // We'll track the volume level in this variable.
-int8_t thevol = 31;
+int8_t thevol = SOUND_OFF_STANDARD_VALUE;
 #define LIGHT_ON_STANDARD_VALUE 100
 #define LIGHT_OFF_STANDARD_VALUE 0
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
 #define LIGHT_DIM_DELAY 50
+#define LIGHT_DIM_OFF_DELAY 80
 #define LIGHT_ON_OFF_DELAY 1000
 
 #define LIGHT_PIN 6
@@ -47,7 +49,7 @@ void setup() {
 }
 
 void setupAmplifier(){
-  if (! setvolume(thevol)) {
+  if (! setvolume(SOUND_OFF_STANDARD_VALUE)) {
     Serial.println("Failed to set volume, MAX9744 not found!");
     while (1);
   }
@@ -70,8 +72,8 @@ void dimLight(int8_t brightness){
 // volume to the i2c bus. That's it!
 boolean setvolume(int8_t v) {
   // cant be higher than 63 or lower than 0
-  if (v > 63) v = 63;
-  if (v < 0) v = 0;
+  if (v > SOUND_MAX_VALUE) v = SOUND_MAX_VALUE;
+  if (v < SOUND_OFF_STANDARD_VALUE) v = SOUND_OFF_STANDARD_VALUE;
   
   Serial.print("Setting volume to ");
   Serial.println(v);
@@ -96,30 +98,47 @@ void setupStateMachines(){
 }
 
 void loop() {
-  checkAndSetLoudness();
-  checkAndSetBrightness();
-  delay(50);
+  checkAndSetLightControls();
+  checkAndSetAudioControls();
+  delay(25);
 }
 
-void checkAndSetBrightness(){
+void checkAndSetLightControls(){
   uint8_t touched = cap.touched();
   if (touched == 0) {
     // No touch detected
     return;
   }
-  Serial.println("Light touched");
-  
   if(touched & (1 << CAP_LIGHT_PLUS)){
-    Serial.println("Light + Sense");
+    Serial.println("Light Sense Plus");
     IN_.LightBrightnessIn(C7_PLUS);
   }
   else if(touched & (1 << CAP_LIGHT_MINUS)){
-    Serial.println("Light - Sense");
+    Serial.println("Light Sense Minus");
     IN_.LightBrightnessIn(C7_MINUS);
   }
   else if(touched & (1 << CAP_LIGHT_ON_OFF)){
-    Serial.println("Light ON/OFF Sense");
+    Serial.println("Light Sense ON/OFF");
     IN_.LightSwitchIn(C5_TOGGLE);
+  }
+}
+void checkAndSetAudioControls(){
+  uint8_t touched = cap.touched();
+  if (touched == 0) {
+    // No touch detected
+    return;
+  }
+  if(touched & (1 << CAP_AUDIO_PLUS)){
+    Serial.println("Audio Sense Plus");
+    IN_.SoundLoudnessIn(C8_PLUS);
+  }
+  else if(touched & (1 << CAP_AUDIO_MINUS)){
+    Serial.println("Audio Sense Minus");
+    IN_.SoundLoudnessIn(C8_MINUS);
+  }
+  else if(touched & (1 << CAP_AUDIO_ON_OFF)){
+    Serial.println("Audio Sense ON/OFF");
+    IN_.SoundSwitchIn(C6_TOGGLE);
   }
 }
 
@@ -137,6 +156,20 @@ void decBrightness(){
   }
 }
 
+void incLoudness(){
+  thevol += SOUND_DIM_STEP;
+  if(thevol > SOUND_MAX_VALUE){
+    thevol = SOUND_MAX_VALUE;
+  }
+}
+
+void decLoudness(){
+  thevol -= SOUND_DIM_STEP;
+  if(thevol <= 0){
+    thevol = 0;
+  }
+}
+
 
 void handleAmplifierCommand(int8_t volume){
   if (volume > 63) volume = 63;
@@ -144,29 +177,6 @@ void handleAmplifierCommand(int8_t volume){
  
   setvolume(volume);
 }
-
-void checkAndSetLoudness(){
-  uint8_t touched = cap.touched();
-
-  if (touched == 0) {
-    // No touch detected
-    return;
-  }
-  
-  if(touched & (1 << CAP_AUDIO_PLUS)){
-    Serial.println("Audio + Sense");
-    IN_.SoundLoudnessIn(C8_PLUS);
-  }
-  else if(touched & (1 << CAP_AUDIO_MINUS)){
-    Serial.println("Audio - Sense");
-    IN_.SoundLoudnessIn(C8_MINUS);
-  }
-  else if(touched & (1 << CAP_AUDIO_ON_OFF)){
-    Serial.println("Audio ON/OFF Sense");
-    IN_.SoundSwitchIn(C6_TOGGLE);
-  }
-}
-
 
 extern "C" {
 
@@ -194,6 +204,12 @@ void uCHAN_LightActionOut (unsigned char name_)
                 delay(LIGHT_DIM_DELAY);
 		break;
 	case C9_OFF:
+                while(lightDimValue > LIGHT_OFF_STANDARD_VALUE){
+                  decBrightness();
+                  dimLight(lightDimValue);
+                  delay(LIGHT_DIM_OFF_DELAY);
+                }
+
                 lightDimValue = LIGHT_OFF_STANDARD_VALUE;
                 dimLight(lightDimValue);
                 Serial.print("Light Off ");
@@ -201,6 +217,11 @@ void uCHAN_LightActionOut (unsigned char name_)
                 delay(LIGHT_ON_OFF_DELAY);
 		break;
 	case C9_ON:
+                while(lightDimValue < LIGHT_ON_STANDARD_VALUE){
+                  incBrightness();
+                  dimLight(lightDimValue);
+                  delay(LIGHT_DIM_OFF_DELAY);
+                }
                 lightDimValue = LIGHT_ON_STANDARD_VALUE;
                 dimLight(lightDimValue);
                 Serial.print("Light On ");
@@ -225,31 +246,31 @@ void uCHAN_SoundActionOut (unsigned char name_)
 	switch (name_)
 	{
 	case C10_MINUS:
-		thevol -= SOUND_DIM_STEP;
-                handleAmplifierCommand(thevol);
+		decLoudness();
                 Serial.print("Sound - ");
                 Serial.println(thevol);
+                handleAmplifierCommand(thevol);
                 delay(SOUND_DIM_DELAY);
 		break;
 	case C10_OFF:
                 thevol = SOUND_OFF_STANDARD_VALUE;
-                handleAmplifierCommand(thevol);                
                 Serial.print("Sound Off ");
                 Serial.println(thevol);
+                handleAmplifierCommand(thevol);                
                 delay(SOUND_ON_OFF_DELAY);
 		break;
 	case C10_ON:
                 thevol = SOUND_ON_STANDARD_VALUE;
-                handleAmplifierCommand(thevol);                
                 Serial.print("Sound On ");
                 Serial.println(thevol);
+                handleAmplifierCommand(thevol);                
                 delay(SOUND_ON_OFF_DELAY);
 		break;
 	case C10_PLUS:
-		thevol += SOUND_DIM_STEP;
-                handleAmplifierCommand(thevol);
+		incLoudness();
                 Serial.print("Sound + ");
                 Serial.println(thevol);
+                handleAmplifierCommand(thevol);
                 delay(SOUND_DIM_DELAY);
 		break;
 	default: 
