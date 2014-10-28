@@ -17,11 +17,17 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 // We'll track the volume level in this variable.
 int8_t thevol = 31;
-int lightDimValue = 31;
+#define LIGHT_ON_STANDARD_VALUE 100
+#define LIGHT_OFF_STANDARD_VALUE 0
+int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
 #define LIGHT_DIM_DELAY 50
+#define LIGHT_ON_OFF_DELAY 1000
 
 #define LIGHT_PIN 6
+boolean isCurrentLightStateOn(){
+  return lightDimValue > LIGHT_OFF_STANDARD_VALUE;
+}
 
 void setup() {
   Serial.begin(9600);
@@ -87,6 +93,24 @@ int8_t checkAmplifierTouchControls(){
   return -1;
 }
 
+int checkLightOnOffTouchControl(){
+  uint8_t touched = cap.touched();
+  if (touched == 0) {
+    // No touch detected
+    return -1;
+  }
+  Serial.println("Light on/off touched");
+  
+  if(touched & (1 << CAP_LIGHT_ON_OFF)){
+    if(isCurrentLightStateOn()){
+      Serial.println("Light off");
+      return 0;
+    }
+    Serial.println("Light on");
+    return 1;
+  }
+  return -1;
+}
 int checkLightTouchControls(){
   uint8_t touched = cap.touched();
   if (touched == 0) {
@@ -138,12 +162,38 @@ void loop() {
     handleAmplifierCommand(volume);
     delay(80);
   }
-  
-  int brightness = checkLightTouchControls();
-  if(brightness >= 0){
-    dimLight(brightness);
-    delay(LIGHT_DIM_DELAY);
+
+  int isLightOnOff = checkLightOnOffTouchControl();
+  if(isLightOnOff > -1){
+    if(isLightOnOff == 0){
+      while(isCurrentLightStateOn()){
+        Serial.print("dec ");
+        Serial.println(lightDimValue);
+        decBrightness();
+        dimLight(lightDimValue);
+        delay(LIGHT_DIM_DELAY);
+      }
+      decBrightness();
+//      analogWrite(LIGHT_PIN, LIGHT_OFF_STANDARD_VALUE);
+    }
+    if(isLightOnOff == 1){
+      while(lightDimValue < LIGHT_ON_STANDARD_VALUE){
+        Serial.print("inc ");
+        Serial.println(lightDimValue);
+        dimLight(lightDimValue);
+        incBrightness();
+        delay(LIGHT_DIM_DELAY);
+      }
+//      analogWrite(LIGHT_PIN, LIGHT_ON_STANDARD_VALUE);
+    }
+    delay(LIGHT_ON_OFF_DELAY);
   }
+  
+    int brightness = checkLightTouchControls();
+    if(brightness >= 0){
+      dimLight(brightness);
+      delay(LIGHT_DIM_DELAY);
+    }
   
   delay(50);
 }
