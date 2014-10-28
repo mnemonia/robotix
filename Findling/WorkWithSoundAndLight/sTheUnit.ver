@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sTheUnit in IMPLEMENTATION Arduino of SYSTEM Findling01
+	October 28, 2014 9:46:08 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sTheUnit terminated
+
+
+Directory for C code files: c:\ws\mnemonia\robotix\Findling\WorktableWithAudioAndLightControls
+
+generating CIP Connector Template Module for CIP SHELL _conTheUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sTheUnit.h ...  complete
+generating CIP SHELL module sTheUnit.c ...  complete
+
+Code generation terminated

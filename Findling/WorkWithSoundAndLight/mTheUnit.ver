@@ -1,0 +1,28 @@
+
+C Code Generation for CIP MACHINE mTheUnit in IMPLEMENTATION Arduino of SYSTEM Findling01
+	October 28, 2014 9:46:14 pm
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mTheUnit terminated
+
+
+Directory for C code files: c:\ws\mnemonia\robotix\Findling\WorktableWithAudioAndLightControls
+
+generating Error Function Template Module for CIP MACHINE _errTheUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceTheUnit.tpl ...  complete
+generating header file for CIP MACHINE mTheUnit.h ...  complete
+generating CIP MACHINE module mTheUnit.c ...  complete
+generating error header file for CIP MACHINE eTheUnit.h ...  complete
+generating error module for CIP MACHINE eTheUnit.c ...  complete
+generating PROCESS module Light.c ...  complete
+generating PROCESS module Sound.c ...  complete
+generating trace header file for CIP MACHINE tTheUnit.h ...  complete
+generating trace module for CIP MACHINE tTheUnit.c ...  complete
+
+Code generation terminated
