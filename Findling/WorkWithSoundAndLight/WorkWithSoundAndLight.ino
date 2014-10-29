@@ -14,6 +14,8 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 #define CAP_LIGHT_PLUS 3
 #define CAP_LIGHT_MINUS 4
 #define CAP_LIGHT_ON_OFF 5
+#define CAP_AMBIENT_ON_OFF 6
+
 // 0x4B is the default i2c address
 #define MAX9744_I2CADDR 0x4B
 #define SOUND_ON_STANDARD_VALUE 50
@@ -23,17 +25,22 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 #define SOUND_ON_OFF_DELAY 1000
 #define SOUND_DIM_STEP 2
 
+
 // We'll track the volume level in this variable.
 int8_t thevol = SOUND_OFF_STANDARD_VALUE;
 #define LIGHT_ON_STANDARD_VALUE 100
 #define LIGHT_OFF_STANDARD_VALUE 0
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
+int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
 #define LIGHT_DIM_DELAY 50
 #define LIGHT_DIM_OFF_DELAY 80
 #define LIGHT_ON_OFF_DELAY 1000
+#define AMBIENT_DIM_STEP 1
+#define AMBIENT_DIM_DELAY 25
 
 #define LIGHT_PIN 6
+#define AMBIENT_PIN 5
 
 void setup() {
   Serial.begin(9600);
@@ -66,6 +73,9 @@ void setupLight(){
 } 
 void dimLight(int8_t brightness){
   analogWrite(LIGHT_PIN, brightness);
+}
+void dimAmbient(int8_t brightness){
+  analogWrite(AMBIENT_PIN, brightness);
 }
 
 // Setting the volume is very simple! Just write the 6-bit
@@ -100,6 +110,7 @@ void setupStateMachines(){
 void loop() {
   checkAndSetLightControls();
   checkAndSetAudioControls();
+  checkAndSetAmbientControls();
   delay(25);
 }
 
@@ -122,6 +133,19 @@ void checkAndSetLightControls(){
     IN_.LightSwitchIn(C5_TOGGLE);
   }
 }
+
+void checkAndSetAmbientControls(){
+  uint8_t touched = cap.touched();
+  if (touched == 0) {
+    // No touch detected
+    return;
+  }
+  if(touched & (1 << CAP_AMBIENT_ON_OFF)){
+    Serial.println("Ambient Sense On/Off");
+    IN_.AmbientSwitch(C11_TOGGLE);
+  }
+}
+
 void checkAndSetAudioControls(){
   uint8_t touched = cap.touched();
   if (touched == 0) {
@@ -156,6 +180,22 @@ void decBrightness(){
   }
 }
 
+
+void incAmbientBrightness(){
+  ambientDimValue += AMBIENT_DIM_STEP;
+  if(ambientDimValue >= 255){
+    ambientDimValue = 255;
+  }
+}
+
+void decAmbientBrightness(){
+  ambientDimValue -= AMBIENT_DIM_STEP;
+  if(ambientDimValue <= 0){
+    ambientDimValue = 0;
+  }
+}
+
+
 void incLoudness(){
   thevol += SOUND_DIM_STEP;
   if(thevol > SOUND_MAX_VALUE){
@@ -187,6 +227,41 @@ extern "C" {
 /* Output Channel Functions,
 	called by CIP Machine when a Message is written.
 	User defined function, with name to consider as suggestion */
+
+void uCHAN_AmbientAction (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C12_OFF:
+                while(ambientDimValue > LIGHT_OFF_STANDARD_VALUE){
+                  decAmbientBrightness();
+                  dimAmbient(ambientDimValue);
+                  delay(AMBIENT_DIM_DELAY);
+                }
+
+                ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
+                dimAmbient(ambientDimValue);
+                Serial.print("Ambient Off ");
+                Serial.println(ambientDimValue);
+                delay(LIGHT_ON_OFF_DELAY);
+		break;
+	case C12_ON:
+                while(ambientDimValue < LIGHT_ON_STANDARD_VALUE){
+                  incAmbientBrightness();
+                  dimAmbient(ambientDimValue);
+                  delay(AMBIENT_DIM_DELAY);
+                }
+                ambientDimValue = LIGHT_ON_STANDARD_VALUE;
+                dimAmbient(ambientDimValue);
+                Serial.print("Ambient On ");
+                Serial.println(ambientDimValue);
+                delay(LIGHT_ON_OFF_DELAY);
+		break;
+	default: 
+		break;
+	}
+}
 
 /* Parameters
 	name_		name value of message */
@@ -293,6 +368,7 @@ void iCHAN_(void)
 
 		/* Initializing Output Interface */
 
+	OUT_.AmbientAction = uCHAN_AmbientAction;
 	OUT_.LightActionOut = uCHAN_LightActionOut;
 	OUT_.SoundActionOut = uCHAN_SoundActionOut;
 }
