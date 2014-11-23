@@ -21,7 +21,7 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 #define SOUND_ON_STANDARD_VALUE 50
 #define SOUND_OFF_STANDARD_VALUE 0
 #define SOUND_MAX_VALUE 63
-#define SOUND_DIM_DELAY 50
+#define SOUND_DIM_DELAY 80
 #define SOUND_ON_OFF_DELAY 1000
 #define SOUND_DIM_STEP 2
 
@@ -41,6 +41,9 @@ int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 
 #define LIGHT_PIN 6
 #define AMBIENT_PIN 5
+#define LOUDSPEAKER_ONOFF_PIN 4
+#define LOUDSPEAKER_PLUS_PIN 3
+#define LOUDSPEAKER_MINUS_PIN 2
 
 void setup() {
   Serial.begin(9600);
@@ -49,10 +52,16 @@ void setup() {
   
   setupCapSensor();  
   setupAmplifier();
+  setupLoudspeakerSensor();
   setupLight();
   setupStateMachines();  
   Serial.println("Starting Findl.ing WorkWithSoundAndLight Controller DONE");
 
+}
+void setupLoudspeakerSensor(){
+  pinMode(LOUDSPEAKER_ONOFF_PIN, INPUT);
+  pinMode(LOUDSPEAKER_PLUS_PIN, INPUT);
+  pinMode(LOUDSPEAKER_MINUS_PIN, INPUT);
 }
 
 void setupAmplifier(){
@@ -109,7 +118,8 @@ void setupStateMachines(){
 
 void loop() {
   checkAndSetLightControls();
-  checkAndSetAudioControls();
+  //checkAndSetAudioControls();
+  checkAndSetLoundspeakerControls();  
   checkAndSetAmbientControls();
   delay(25);
 }
@@ -163,6 +173,26 @@ void checkAndSetAudioControls(){
   else if(touched & (1 << CAP_AUDIO_ON_OFF)){
     Serial.println("Audio Sense ON/OFF");
     IN_.SoundSwitchIn(C6_TOGGLE);
+  }
+}
+
+void checkAndSetLoundspeakerControls(){
+  int touched = digitalRead(LOUDSPEAKER_ONOFF_PIN);
+  if (touched == LOW) {
+    Serial.println("Loudspeaker Sense ON/OFF");
+    IN_.SoundSwitchIn(C6_TOGGLE);
+  }else{
+    touched = digitalRead(LOUDSPEAKER_MINUS_PIN);    
+    if (touched == LOW) {
+      Serial.println("Loudspeaker Sense Minus");
+      IN_.SoundLoudnessIn(C8_MINUS);
+    }else{
+      touched = digitalRead(LOUDSPEAKER_PLUS_PIN);    
+      if (touched == LOW) {
+        Serial.println("Loudspeaker Sense Minus");
+        IN_.SoundLoudnessIn(C8_PLUS);
+      }
+    }
   }
 }
 
