@@ -18,7 +18,7 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 // 0x4B is the default i2c address
 #define MAX9744_I2CADDR 0x4B
-#define SOUND_ON_STANDARD_VALUE 50
+#define SOUND_ON_STANDARD_VALUE 40
 #define SOUND_OFF_STANDARD_VALUE 0
 #define SOUND_MAX_VALUE 63
 #define SOUND_DIM_DELAY 80
@@ -30,6 +30,7 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 int8_t thevol = SOUND_OFF_STANDARD_VALUE;
 #define LIGHT_ON_STANDARD_VALUE 100
 #define LIGHT_OFF_STANDARD_VALUE 0
+#define LIGHT_ON_MAX_VALUE 150
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
@@ -198,8 +199,8 @@ void checkAndSetLoundspeakerControls(){
 
 void incBrightness(){
   lightDimValue += LIGHT_DIM_STEP;
-  if(lightDimValue >= 255){
-    lightDimValue = 255;
+  if(lightDimValue >= LIGHT_ON_MAX_VALUE){
+    lightDimValue = LIGHT_ON_MAX_VALUE;
   }
 }
 
