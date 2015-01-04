@@ -1,0 +1,34 @@
+
+C Code Generation for CIP MACHINE mDriveUnit in IMPLEMENTATION ArduinoImpl of SYSTEM Lillebro
+	January 4, 2015 3:20:25 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP MACHINE mDriveUnit terminated
+
+
+Directory for C code files: c:\ws\mnemonia\robotix\Robots\Lillebro
+
+generating Error Function Template Module for CIP MACHINE _errDriveUnit.tpl ...  complete
+generating trace template file for CIP MACHINE _traceDriveUnit.tpl ...  complete
+generating header file for CIP MACHINE mDriveUnit.h ...  complete
+generating CIP MACHINE module mDriveUnit.c ...  complete
+generating error header file for CIP MACHINE eDriveUnit.h ...  complete
+generating error module for CIP MACHINE eDriveUnit.c ...  complete
+generating PROCESS module Behavior.c ...  complete
+generating PROCESS module Demo.c ...  complete
+generating PROCESS module Drive.c ...  complete
+generating PROCESS module IndicatorLight.c ...  complete
+generating PROCESS module MotorLeft.c ...  complete
+generating PROCESS module MotorRight.c ...  complete
+generating PROCESS module Proximity.c ...  complete
+generating PROCESS module WanderLightController.c ...  complete
+generating trace header file for CIP MACHINE tDriveUnit.h ...  complete
+generating trace module for CIP MACHINE tDriveUnit.c ...  complete
+
+Code generation terminated

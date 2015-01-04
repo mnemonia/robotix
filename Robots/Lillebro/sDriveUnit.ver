@@ -1,0 +1,21 @@
+
+C Code Generation for CIP SHELL sDriveUnit in IMPLEMENTATION ArduinoImpl of SYSTEM Lillebro
+	January 4, 2015 3:20:24 am
+
+
+Errors
+	No Error
+
+Warnings
+	No Warning
+
+Verification of CIP SHELL sDriveUnit terminated
+
+
+Directory for C code files: c:\ws\mnemonia\robotix\Robots\Lillebro
+
+generating CIP Connector Template Module for CIP SHELL _conDriveUnit.tpl ...  complete
+generating shell headerfile for CIP SHELL sDriveUnit.h ...  complete
+generating CIP SHELL module sDriveUnit.c ...  complete
+
+Code generation terminated
