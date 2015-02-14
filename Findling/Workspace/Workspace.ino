@@ -600,6 +600,42 @@ void uCHAN_LightSwitchAction (unsigned char name_)
 	}
 }
 
+void uCHAN_AmbientDimAction (unsigned char name_)
+{
+	/* Accessing MESSAGE */
+	switch (name_)
+	{
+	case C4_MINUS:
+                if(ambientDimValue <= LIGHT_OFF_STANDARD_VALUE){
+                  ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
+                  Serial.print("Dimming ambient light down done on ");
+                  Serial.println(ambientDimValue);
+                  IN_.AmbientDimReply(C5_IS_OFF);
+                }else{
+                  Serial.print("Dimming ambient light down to ");
+                  Serial.println(ambientDimValue);
+                  decAmbientBrightness();
+                  dimAmbient(ambientDimValue);
+                }
+		break;
+	case C4_PLUS:
+                if(ambientDimValue >= LIGHT_ON_STANDARD_VALUE){
+                  ambientDimValue = LIGHT_ON_STANDARD_VALUE;
+                  Serial.print("Dimming ambient light up done on ");
+                  Serial.println(ambientDimValue);
+                  IN_.AmbientDimReply(C5_IS_ON);
+                }else{
+                  Serial.print("Dimming ambient light up to ");
+                  Serial.println(ambientDimValue);
+                  incAmbientBrightness();
+                  dimAmbient(ambientDimValue);
+                }
+		break;
+	default: 
+		break;
+	}
+}
+
 
 //IN_.AmbientDimEvent(name_AmbientDimEvent);
 
@@ -616,6 +652,7 @@ void iCHAN_(void)
 	#endif 
 
 		/* Initializing Output Interface */
+	OUT_.AmbientDimAction = uCHAN_AmbientDimAction;
 	OUT_.LightSwitchAction = uCHAN_LightSwitchAction;
 }
 

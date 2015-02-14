@@ -1,6 +1,6 @@
 
 C Code Generation for CIP MACHINE mTheUnit in IMPLEMENTATION Arduino of SYSTEM Workspace
-	February 14, 2015 2:08:49 am
+	February 14, 2015 2:52:47 am
 
 
 Errors
@@ -20,6 +20,8 @@ generating header file for CIP MACHINE mTheUnit.h ...  complete
 generating CIP MACHINE module mTheUnit.c ...  complete
 generating error header file for CIP MACHINE eTheUnit.h ...  complete
 generating error module for CIP MACHINE eTheUnit.c ...  complete
+generating PROCESS module AmbientLight.c ...  complete
+generating PROCESS module AmbientLightDimmer.c ...  complete
 generating PROCESS module Light.c ...  complete
 generating PROCESS module LightDimmer.c ...  complete
 generating PROCESS module LightSwitch.c ...  complete
