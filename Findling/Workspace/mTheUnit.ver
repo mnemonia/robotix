@@ -1,6 +1,6 @@
 
 C Code Generation for CIP MACHINE mTheUnit in IMPLEMENTATION Arduino of SYSTEM Workspace
-	February 15, 2015 8:35:00 pm
+	February 15, 2015 10:53:55 pm
 
 
 Errors
@@ -34,6 +34,10 @@ generating PROCESS module LightDimmer.c ...  complete
 generating PROCESS module LightMinusButton.c ...  complete
 generating PROCESS module LightPlusButton.c ...  complete
 generating PROCESS module LightSwitch.c ...  complete
+generating PROCESS module SoundController.c ...  complete
+generating PROCESS module SoundMinusButton.c ...  complete
+generating PROCESS module SoundPlusButton.c ...  complete
+generating PROCESS module SoundSwitch.c ...  complete
 generating trace header file for CIP MACHINE tTheUnit.h ...  complete
 generating trace module for CIP MACHINE tTheUnit.c ...  complete
 
