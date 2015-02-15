@@ -33,6 +33,7 @@ int8_t thevol = SOUND_OFF_STANDARD_VALUE;
 #define LIGHT_ON_STANDARD_VALUE 100
 #define LIGHT_OFF_STANDARD_VALUE 0
 #define LIGHT_ON_MAX_VALUE 130
+#define LIGHT_ON_MIN_VISIBLE_VALUE 10
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
@@ -571,31 +572,51 @@ void uCHAN_LightSwitchAction (unsigned char name_)
 	switch (name_)
 	{
 	case C1_MINUS:
-                if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
+                decBrightness();
+                if(lightDimValue < LIGHT_OFF_STANDARD_VALUE){
                   lightDimValue = LIGHT_OFF_STANDARD_VALUE;
+                }
+                Serial.print("Dimming light down to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
                   Serial.print("Dimming light down done on ");
                   Serial.println(lightDimValue);
                   IN_.LightSwitchDimReply(C3_IS_OFF);
-                }else{
-                  Serial.print("Dimming light down to ");
-                  Serial.println(lightDimValue);
-                  decBrightness();
-                  dimLight(lightDimValue);
                 }
-		break;
+                
+                break;
 	case C1_PLUS:
+                incBrightness();
+                if(lightDimValue > LIGHT_ON_MAX_VALUE){
+                  lightDimValue = LIGHT_ON_MAX_VALUE;
+                }
+                Serial.print("Dimming light up to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
                 if(lightDimValue >= LIGHT_ON_STANDARD_VALUE){
-                  lightDimValue = LIGHT_ON_STANDARD_VALUE;
                   Serial.print("Dimming light up done on ");
                   Serial.println(lightDimValue);
                   IN_.LightSwitchDimReply(C3_IS_ON);
-                }else{
-                  Serial.print("Dimming light up to ");
-                  Serial.println(lightDimValue);
-                  incBrightness();
-                  dimLight(lightDimValue);
                 }		
                 break;
+	case C1_PLUS_DIRECT_ON:
+                incBrightness();
+                if(lightDimValue > LIGHT_ON_MAX_VALUE){
+                  lightDimValue = LIGHT_ON_MAX_VALUE;
+                }
+                Serial.print("Dimming light direct up to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue >= LIGHT_ON_MIN_VISIBLE_VALUE){
+                  Serial.print("Dimming light direct up done on ");
+                  Serial.println(lightDimValue);
+                  IN_.LightSwitchDimReply(C3_IS_ON);
+                }
+		break;
 	default: 
 		break;
 	}
