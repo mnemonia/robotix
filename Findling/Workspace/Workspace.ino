@@ -689,7 +689,7 @@ void uCHAN_SoundActions (unsigned char name_)
                 Serial.print("Sound + ");
                 Serial.println(thevol);
                 handleAmplifierCommand(thevol);
-                if(thevol == SOUND_ON_STANDARD_VALUE){
+                if(thevol >= SOUND_ON_STANDARD_VALUE){
                   Serial.println("Sound On");
                   IN_.SoundControlEvents(C12_IS_ON);                
                 }
@@ -699,6 +699,7 @@ void uCHAN_SoundActions (unsigned char name_)
                 Serial.print("Sound Direct + ");
                 Serial.println(thevol);
                 handleAmplifierCommand(thevol);
+                Serial.println("Sound On");
                 IN_.SoundControlEvents(C12_IS_ON);
 		break;
 	default: 
