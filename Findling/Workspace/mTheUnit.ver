@@ -1,13 +1,19 @@
 
 C Code Generation for CIP MACHINE mTheUnit in IMPLEMENTATION Arduino of SYSTEM Workspace
-	February 14, 2015 2:52:47 am
+	February 15, 2015 12:40:49 pm
 
 
 Errors
 	No Error
 
 Warnings
-	No Warning
+
+	Warning for PROCESS Light
+		untranslated OUTPULSE -> OFF; ON; 
+		non interacting OUTPULSE -> OFF; ON; 
+
+	Warning for PROCESS LightDimmer
+		MODE manual incomplete ->  TRANSITIONS 2; 
 
 Verification of CIP MACHINE mTheUnit terminated
 
@@ -23,7 +29,10 @@ generating error module for CIP MACHINE eTheUnit.c ...  complete
 generating PROCESS module AmbientLight.c ...  complete
 generating PROCESS module AmbientLightDimmer.c ...  complete
 generating PROCESS module Light.c ...  complete
+generating PROCESS module LightController.c ...  complete
 generating PROCESS module LightDimmer.c ...  complete
+generating PROCESS module LightMinusButton.c ...  complete
+generating PROCESS module LightPlusButton.c ...  complete
 generating PROCESS module LightSwitch.c ...  complete
 generating trace header file for CIP MACHINE tTheUnit.h ...  complete
 generating trace module for CIP MACHINE tTheUnit.c ...  complete

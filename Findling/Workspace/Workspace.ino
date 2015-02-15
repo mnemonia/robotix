@@ -159,18 +159,19 @@ void incrementTime(){
 void manualControl(){
   if(comp("L+")==0){
     Serial.println("Manual Light +");
-//IN_.LightSwitchEvent(name_LightSwitchEvent);
-//    IN_.LightBrightnessIn(C7_PLUS);
+    IN_.LightDimPlusEvents(C6_PRESS);
+  }else{
+    IN_.LightDimPlusEvents(C6_RELEASE);
   }
   if(comp("L-")==0){
     Serial.println("Manual Light -");
-//IN_.LightSwitchEvent(name_LightSwitchEvent);
-//    IN_.LightBrightnessIn(C7_MINUS);
+    IN_.LightDimMinusEvents(C7_PRESS);
+  }else{
+    IN_.LightDimMinusEvents(C7_RELEASE);
   }
   if(comp("L")==0){
     Serial.println("Manual Light Toggle");
-IN_.LightSwitchEvent(C2_TOGGLE);
-//    IN_.LightSwitchIn(C5_TOGGLE);
+    IN_.LightSwitchEvent(C2_TOGGLE);
   }
   
 }
@@ -593,8 +594,8 @@ void uCHAN_LightSwitchAction (unsigned char name_)
                   Serial.println(lightDimValue);
                   incBrightness();
                   dimLight(lightDimValue);
-                }
-		break;
+                }		
+                break;
 	default: 
 		break;
 	}
@@ -635,8 +636,28 @@ void uCHAN_AmbientDimAction (unsigned char name_)
 		break;
 	}
 }
-
-
+/*
+void uCHAN_LightDimPlusActions (unsigned char name_)
+{
+	switch (name_)
+	{
+	case C7_PLUS:
+                if(lightDimValue >= LIGHT_ON_MAX_VALUE){
+                  lightDimValue = LIGHT_ON_MAX_VALUE;
+                  Serial.print("Dimming light plus done on ");
+                  Serial.println(lightDimValue);
+                }else{
+                  Serial.print("Dimming light plus to ");
+                  Serial.println(lightDimValue);
+                  incBrightness();
+                  dimLight(lightDimValue);
+                }
+		break;
+	default: 
+		break;
+	}
+}
+*/
 //IN_.AmbientDimEvent(name_AmbientDimEvent);
 
 /*********************************************************************
