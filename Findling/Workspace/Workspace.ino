@@ -41,7 +41,7 @@ int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_OFF_DELAY 80
 #define LIGHT_ON_OFF_DELAY 1000
 #define AMBIENT_DIM_STEP 1
-#define AMBIENT_DIM_DELAY 25
+#define AMBIENT_DIM_MIN 0
 
 #define LIGHT_PIN 6
 #define AMBIENT_PIN 5
@@ -51,7 +51,7 @@ int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 
 long currentMillies = 0L;
 long previousMillis = 0;
-long interval = 25;  
+long interval = 20;  
 
 char inData[20]; // Allocate some space for the string
 char inChar=-1; // Where to store the character read
@@ -150,9 +150,9 @@ void loop(){
 }
 
 void incrementTime(){
-  manualLightControl();
-  manualSoundControl();
-//  readSensors();
+//  manualLightControl();
+//  manualSoundControl();
+  readSensors();
   TRG_.TICK_(); 		/* increment CIP Machine time by one Tick */
   if (TRG_.PENDING_.TIMEUP_) TRG_.TIMEUP_(); /* timeup call */
 // Serial.println("TICK");
@@ -230,17 +230,26 @@ void checkAndSetLightControls(){
     return;
   }
   if(touched & (1 << CAP_LIGHT_PLUS)){
-    Serial.println("Light Sense Plus");
-    //IN_.LightBrightnessIn(C7_PLUS);
+    Serial.println("Light Sense Plus Press");
+    IN_.LightDimPlusEvents(C6_PRESS);
+  }else{
+    Serial.println("Light Sense Plus Release");
+//    IN_.LightDimPlusEvents(C6_RELEASE);
   }
-  else if(touched & (1 << CAP_LIGHT_MINUS)){
-    Serial.println("Light Sense Minus");
-    //IN_.LightBrightnessIn(C7_MINUS);
+
+  if(touched & (1 << CAP_LIGHT_MINUS)){
+    Serial.println("Light Sense Minus Press");
+    IN_.LightDimMinusEvents(C7_PRESS);
+  }else{
+    Serial.println("Light Sense Minus Release");
+//    IN_.LightDimMinusEvents(C7_RELEASE);
   }
-  else if(touched & (1 << CAP_LIGHT_ON_OFF)){
+  
+  if(touched & (1 << CAP_LIGHT_ON_OFF)){
+    IN_.LightDimPlusEvents(C6_RELEASE);
+    IN_.LightDimMinusEvents(C7_RELEASE);
     Serial.println("Light Sense ON/OFF");
     IN_.LightSwitchEvent(C2_TOGGLE);
-//    IN_.LightSwitchIn(C5_TOGGLE);
   }
 }
 /*
@@ -266,14 +275,21 @@ void checkAndSetAudioControls(){
   if(touched & (1 << CAP_AUDIO_PLUS)){
     Serial.println("Audio Sense Plus");
     //IN_.SoundLoudnessIn(C8_PLUS);
+    IN_.SoundPlusChannel(C8_PRESSED);
+  }else{
+    IN_.SoundPlusChannel(C8_RELEASED);
   }
-  else if(touched & (1 << CAP_AUDIO_MINUS)){
+  
+  if(touched & (1 << CAP_AUDIO_MINUS)){
     Serial.println("Audio Sense Minus");
-    //IN_.SoundLoudnessIn(C8_MINUS);
+    IN_.SoundMinusChannel(C9_PRESSED);
+  }else{
+    IN_.SoundMinusChannel(C9_RELEASED);
   }
-  else if(touched & (1 << CAP_AUDIO_ON_OFF)){
+  
+  if(touched & (1 << CAP_AUDIO_ON_OFF)){
     Serial.println("Audio Sense ON/OFF");
-    //IN_.SoundSwitchIn(C6_TOGGLE);
+    IN_.SoundSwitchChannel(C10_TOGGLE);
   }
 }
 
@@ -601,6 +617,7 @@ void uCHAN_LightSwitchAction (unsigned char name_)
                 if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
                   Serial.print("Dimming light down done on ");
                   Serial.println(lightDimValue);
+                  lightDimValue = 0;
                   IN_.LightSwitchDimReply(C3_IS_OFF);
                 }
                 
@@ -622,6 +639,7 @@ void uCHAN_LightSwitchAction (unsigned char name_)
                 Serial.print("Dimming light direct up to ");
                 Serial.println(lightDimValue);
                 dimLight(lightDimValue);
+                  IN_.LightSwitchDimReply(C3_IS_ON);
 
                 if(lightDimValue >= LIGHT_ON_MIN_VISIBLE_VALUE){
                   Serial.print("Dimming light direct up done on ");
@@ -640,9 +658,11 @@ void uCHAN_AmbientDimAction (unsigned char name_)
 	switch (name_)
 	{
 	case C4_MINUS:
-                if(ambientDimValue <= LIGHT_OFF_STANDARD_VALUE){
+                if(ambientDimValue <= AMBIENT_DIM_MIN){
                   Serial.print("Dimming ambient light down done on ");
                   Serial.println(ambientDimValue);
+                  ambientDimValue = 0;
+                  dimAmbient(ambientDimValue);
                   IN_.AmbientDimReply(C5_IS_OFF);
                 }else{
                   Serial.print("Dimming ambient light down to ");
