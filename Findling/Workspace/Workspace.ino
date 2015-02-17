@@ -18,25 +18,27 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 // 0x4B is the default i2c address
 #define MAX9744_I2CADDR 0x4B
-// 35 is ok for sound off
-#define SOUND_ON_STANDARD_VALUE 30
+// 35 is ok for sound off, 30 is no noise
+#define SOUND_ON_STANDARD_VALUE 35
 #define SOUND_OFF_STANDARD_VALUE 0
-// 44 is ok for max sound, 63 is max
-#define SOUND_MAX_VALUE 40
+// 44 is ok for max sound, 63 is max, 40 is no noise
+#define SOUND_MAX_VALUE 50
 #define SOUND_DIM_DELAY 80
 #define SOUND_ON_OFF_DELAY 1000
-#define SOUND_DIM_STEP 2
+#define SOUND_DIM_STEP 1
 
 
 // We'll track the volume level in this variable.
 int thevol = SOUND_OFF_STANDARD_VALUE;
 #define LIGHT_ON_STANDARD_VALUE 100
 #define LIGHT_OFF_STANDARD_VALUE 0
-#define LIGHT_ON_MAX_VALUE 130
+// 130 is no noise
+#define LIGHT_ON_MAX_VALUE 170
 #define LIGHT_ON_MIN_VISIBLE_VALUE 10
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
+#define LIGHT_MANUAL_DIM_STEP 2
 #define LIGHT_DIM_DELAY 50
 #define LIGHT_DIM_OFF_DELAY 80
 #define LIGHT_ON_OFF_DELAY 1000
@@ -233,7 +235,7 @@ void checkAndSetLightControls(){
     Serial.println("Light Sense Plus Press");
     IN_.LightDimPlusEvents(C6_PRESS);
   }else{
-    Serial.println("Light Sense Plus Release");
+//    Serial.println("Light Sense Plus Release");
 //    IN_.LightDimPlusEvents(C6_RELEASE);
   }
 
@@ -241,12 +243,14 @@ void checkAndSetLightControls(){
     Serial.println("Light Sense Minus Press");
     IN_.LightDimMinusEvents(C7_PRESS);
   }else{
-    Serial.println("Light Sense Minus Release");
+//    Serial.println("Light Sense Minus Release");
 //    IN_.LightDimMinusEvents(C7_RELEASE);
   }
   
   if(touched & (1 << CAP_LIGHT_ON_OFF)){
+    Serial.println("Light Sense Plus Release");
     IN_.LightDimPlusEvents(C6_RELEASE);
+    Serial.println("Light Sense Minus Release");
     IN_.LightDimMinusEvents(C7_RELEASE);
     Serial.println("Light Sense ON/OFF");
     IN_.LightSwitchEvent(C2_TOGGLE);
@@ -277,18 +281,18 @@ void checkAndSetAudioControls(){
     //IN_.SoundLoudnessIn(C8_PLUS);
     IN_.SoundPlusChannel(C8_PRESSED);
   }else{
-    IN_.SoundPlusChannel(C8_RELEASED);
   }
   
   if(touched & (1 << CAP_AUDIO_MINUS)){
     Serial.println("Audio Sense Minus");
     IN_.SoundMinusChannel(C9_PRESSED);
   }else{
-    IN_.SoundMinusChannel(C9_RELEASED);
   }
   
   if(touched & (1 << CAP_AUDIO_ON_OFF)){
     Serial.println("Audio Sense ON/OFF");
+    IN_.SoundPlusChannel(C8_RELEASED);
+    IN_.SoundMinusChannel(C9_RELEASED);
     IN_.SoundSwitchChannel(C10_TOGGLE);
   }
 }
@@ -297,17 +301,20 @@ void checkAndSetLoundspeakerControls(){
   int touched = digitalRead(LOUDSPEAKER_ONOFF_PIN);
   if (touched == LOW) {
     Serial.println("Loudspeaker Sense ON/OFF");
-    //IN_.SoundSwitchIn(C6_TOGGLE);
+    Serial.println("Audio Sense ON/OFF");
+    IN_.SoundPlusChannel(C8_RELEASED);
+    IN_.SoundMinusChannel(C9_RELEASED);
+    IN_.SoundSwitchChannel(C10_TOGGLE);
   }else{
     touched = digitalRead(LOUDSPEAKER_MINUS_PIN);    
     if (touched == LOW) {
       Serial.println("Loudspeaker Sense Minus");
-    //  IN_.SoundLoudnessIn(C8_MINUS);
+      IN_.SoundMinusChannel(C9_PRESSED);
     }else{
       touched = digitalRead(LOUDSPEAKER_PLUS_PIN);    
       if (touched == LOW) {
         Serial.println("Loudspeaker Sense Minus");
-    //    IN_.SoundLoudnessIn(C8_PLUS);
+        IN_.SoundPlusChannel(C8_PRESSED);
       }
     }
   }
@@ -327,6 +334,20 @@ void decBrightness(){
   }
 }
 
+void incManualBrightness(){
+  lightDimValue += LIGHT_MANUAL_DIM_STEP;
+  if(lightDimValue >= LIGHT_ON_MAX_VALUE){
+    lightDimValue = LIGHT_ON_MAX_VALUE;
+  }
+}
+
+void decManualBrightness(){
+  lightDimValue -= LIGHT_MANUAL_DIM_STEP;
+  if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
+    lightDimValue = LIGHT_OFF_STANDARD_VALUE;
+  }
+}
+
 
 void incAmbientBrightness(){
   ambientDimValue += AMBIENT_DIM_STEP;
@@ -341,7 +362,6 @@ void decAmbientBrightness(){
     ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
   }
 }
-
 
 void incLoudness(){
   thevol += SOUND_DIM_STEP;
