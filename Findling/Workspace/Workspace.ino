@@ -60,9 +60,9 @@ byte index = 0; // Index into array; where to store the character
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Starting Findl.ing WorkWithSoundAndLight Controller ...");
+  Serial.println("Starting Findl.ing Workdesk Controller ...");
   
-//  setPwmFrequency(LIGHT_PIN, 1);
+  //setPwmFrequency(LIGHT_PIN, 1);
   
   Wire.begin();
   setupStateMachines();  
