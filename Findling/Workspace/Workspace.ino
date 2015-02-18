@@ -23,6 +23,7 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 #define SOUND_OFF_STANDARD_VALUE 0
 // 44 is ok for max sound, 63 is max, 40 is no noise
 #define SOUND_MAX_VALUE 50
+#define SOUND_MIN_VALUE 8
 #define SOUND_DIM_DELAY 80
 #define SOUND_ON_OFF_DELAY 1000
 #define SOUND_DIM_STEP 1
@@ -38,10 +39,8 @@ int thevol = SOUND_OFF_STANDARD_VALUE;
 int lightDimValue = LIGHT_OFF_STANDARD_VALUE;
 int ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
 #define LIGHT_DIM_STEP 5
+#define LIGHT_DIM_MINUS_STEP 2
 #define LIGHT_MANUAL_DIM_STEP 2
-#define LIGHT_DIM_DELAY 50
-#define LIGHT_DIM_OFF_DELAY 80
-#define LIGHT_ON_OFF_DELAY 1000
 #define AMBIENT_DIM_STEP 1
 #define AMBIENT_DIM_MIN 0
 
@@ -234,17 +233,11 @@ void checkAndSetLightControls(){
   if(touched & (1 << CAP_LIGHT_PLUS)){
     Serial.println("Light Sense Plus Press");
     IN_.LightDimPlusEvents(C6_PRESS);
-  }else{
-//    Serial.println("Light Sense Plus Release");
-//    IN_.LightDimPlusEvents(C6_RELEASE);
   }
 
   if(touched & (1 << CAP_LIGHT_MINUS)){
     Serial.println("Light Sense Minus Press");
     IN_.LightDimMinusEvents(C7_PRESS);
-  }else{
-//    Serial.println("Light Sense Minus Release");
-//    IN_.LightDimMinusEvents(C7_RELEASE);
   }
   
   if(touched & (1 << CAP_LIGHT_ON_OFF)){
@@ -256,52 +249,11 @@ void checkAndSetLightControls(){
     IN_.LightSwitchEvent(C2_TOGGLE);
   }
 }
-/*
-void checkAndSetAmbientControls(){
-  uint8_t touched = cap.touched();
-  if (touched == 0) {
-    // No touch detected
-    return;
-  }
-  if(touched & (1 << CAP_AMBIENT_ON_OFF)){
-    Serial.println("Ambient Sense On/Off");
-    IN_.AmbientSwitch(C11_TOGGLE);
-  }
-}
-*/
-
-void checkAndSetAudioControls(){
-  uint8_t touched = cap.touched();
-  if (touched == 0) {
-    // No touch detected
-    return;
-  }
-  if(touched & (1 << CAP_AUDIO_PLUS)){
-    Serial.println("Audio Sense Plus");
-    //IN_.SoundLoudnessIn(C8_PLUS);
-    IN_.SoundPlusChannel(C8_PRESSED);
-  }else{
-  }
-  
-  if(touched & (1 << CAP_AUDIO_MINUS)){
-    Serial.println("Audio Sense Minus");
-    IN_.SoundMinusChannel(C9_PRESSED);
-  }else{
-  }
-  
-  if(touched & (1 << CAP_AUDIO_ON_OFF)){
-    Serial.println("Audio Sense ON/OFF");
-    IN_.SoundPlusChannel(C8_RELEASED);
-    IN_.SoundMinusChannel(C9_RELEASED);
-    IN_.SoundSwitchChannel(C10_TOGGLE);
-  }
-}
 
 void checkAndSetLoundspeakerControls(){
   int touched = digitalRead(LOUDSPEAKER_ONOFF_PIN);
   if (touched == LOW) {
     Serial.println("Loudspeaker Sense ON/OFF");
-    Serial.println("Audio Sense ON/OFF");
     IN_.SoundPlusChannel(C8_RELEASED);
     IN_.SoundMinusChannel(C9_RELEASED);
     IN_.SoundSwitchChannel(C10_TOGGLE);
@@ -313,7 +265,7 @@ void checkAndSetLoundspeakerControls(){
     }else{
       touched = digitalRead(LOUDSPEAKER_PLUS_PIN);    
       if (touched == LOW) {
-        Serial.println("Loudspeaker Sense Minus");
+        Serial.println("Loudspeaker Sense Plus");
         IN_.SoundPlusChannel(C8_PRESSED);
       }
     }
@@ -328,7 +280,7 @@ void incBrightness(){
 }
 
 void decBrightness(){
-  lightDimValue -= LIGHT_DIM_STEP;
+  lightDimValue -= LIGHT_DIM_MINUS_STEP;
   if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
     lightDimValue = LIGHT_OFF_STANDARD_VALUE;
   }
@@ -373,6 +325,8 @@ void incLoudness(){
 void decLoudness(){
   thevol -= SOUND_DIM_STEP;
   if(thevol <= 0){
+    thevol = 0;
+  }else if(thevol <= SOUND_MIN_VALUE){
     thevol = 0;
   }
 }
@@ -454,224 +408,6 @@ extern "C" {
 	User defined Output Channel Functions
 *********************************************************************/
 
-/*
-void uCHAN_LightDimAction (unsigned char name_)
-{
-	switch (name_)
-	{
-	case C15_MINUS:
-                  decBrightness();
-                  dimLight(lightDimValue);
-                  Serial.print("Light Dim Minus ");
-                  Serial.println(lightDimValue);
-                  if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
-                    Serial.println("Light Dim Minus Off");
-                    IN_.LightSwitchIn(C5_IS_OFF);
-                  }
-		break;
-	case C15_OFF:
-                  lightDimValue = LIGHT_OFF_STANDARD_VALUE;
-		break;
-	case C15_ON:
-                  lightDimValue = LIGHT_ON_STANDARD_VALUE;
-		break;
-	case C15_PLUS:
-                  incBrightness();
-                  dimLight(lightDimValue);
-                  Serial.print("Light Dim Plus ");
-                  Serial.println(lightDimValue);
-                  if(lightDimValue >= LIGHT_ON_STANDARD_VALUE){
-                    Serial.println("Light Dim Plus On");
-                    lightDimValue = LIGHT_ON_STANDARD_VALUE;
-                    IN_.LightSwitchIn(C5_IS_ON);
-                  }
-		break;
-	default: 
-		break;
-	}
-}
-*/
-
-/*
-void uCHAN_AmbientDimAction (unsigned char name_)
-{
-	switch (name_)
-	{
-	case C13_MINUS:
-                if(ambientDimValue > LIGHT_OFF_STANDARD_VALUE){
-                  decAmbientBrightness();
-                  dimAmbient(ambientDimValue);
-                  Serial.println("Ambient Dim Darker ");
-                  Serial.println(ambientDimValue);
-                }else{
-                  Serial.println("Ambient Dim is off");
-                  ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
-                  IN_.AmbientDimEvent(C14_IS_OFF);
-                }
-		break;
-	case C13_OFF:
-                  ambientDimValue = LIGHT_OFF_STANDARD_VALUE;
-                  dimAmbient(ambientDimValue);
-		break;
-	case C13_PLUS:
-                if(ambientDimValue < LIGHT_ON_STANDARD_VALUE){
-                  incAmbientBrightness();
-                  dimAmbient(ambientDimValue);
-                  Serial.print("Ambient Dim Brighter ");
-                  Serial.println(ambientDimValue);
-                }else{
-                  Serial.println("Ambient Dim is on");
-                  ambientDimValue = LIGHT_ON_STANDARD_VALUE;
-                  IN_.AmbientDimEvent(C14_IS_ON);
-                }
-		break;
-	default: 
-		break;
-	}
-}
-*/
-
-/* Parameters
-	name_		name value of message */
-
-/*
-void uCHAN_LightActionOut (unsigned char name_)
-{
-	switch (name_)
-	{
-	case C9_MINUS:
-                decBrightness();
-                dimLight(lightDimValue);
-                Serial.print("Light - ");
-                Serial.println(lightDimValue);
-                delay(LIGHT_DIM_DELAY);
-		break;
-	case C9_OFF:
-                while(lightDimValue > LIGHT_OFF_STANDARD_VALUE){
-                  decBrightness();
-                  dimLight(lightDimValue);
-                  delay(LIGHT_DIM_OFF_DELAY);
-                }
-
-                lightDimValue = LIGHT_OFF_STANDARD_VALUE;
-                dimLight(lightDimValue);
-                Serial.print("Light Off ");
-                Serial.println(lightDimValue);
-                delay(LIGHT_ON_OFF_DELAY);
-		break;
-	case C9_ON:
-                while(lightDimValue < LIGHT_ON_STANDARD_VALUE){
-                  incBrightness();
-                  dimLight(lightDimValue);
-                  delay(LIGHT_DIM_OFF_DELAY);
-                }
-                lightDimValue = LIGHT_ON_STANDARD_VALUE;
-                dimLight(lightDimValue);
-                Serial.print("Light On ");
-                Serial.println(lightDimValue);
-                delay(LIGHT_ON_OFF_DELAY);
-		break;
-	case C9_PLUS:
-                incBrightness();
-                dimLight(lightDimValue);
-                Serial.print("Light + ");
-                Serial.println(lightDimValue);
-                delay(LIGHT_DIM_DELAY);
-		break;
-	default: 
-		break;
-	}
-}
-*/
-
-/*
-void uCHAN_SoundActionOut (unsigned char name_)
-{
-	switch (name_)
-	{
-	case C10_MINUS:
-		decLoudness();
-                Serial.print("Sound - ");
-                Serial.println(thevol);
-                handleAmplifierCommand(thevol);
-                delay(SOUND_DIM_DELAY);
-		break;
-	case C10_OFF:
-                thevol = SOUND_OFF_STANDARD_VALUE;
-                Serial.print("Sound Off ");
-                Serial.println(thevol);
-                handleAmplifierCommand(thevol);                
-                delay(SOUND_ON_OFF_DELAY);
-		break;
-	case C10_ON:
-                thevol = SOUND_ON_STANDARD_VALUE;
-                Serial.print("Sound On ");
-                Serial.println(thevol);
-                handleAmplifierCommand(thevol);                
-                delay(SOUND_ON_OFF_DELAY);
-		break;
-	case C10_PLUS:
-		incLoudness();
-                Serial.print("Sound + ");
-                Serial.println(thevol);
-                handleAmplifierCommand(thevol);
-                delay(SOUND_DIM_DELAY);
-		break;
-	default: 
-		break;
-	}
-}
-*/
-
-void uCHAN_LightSwitchAction (unsigned char name_)
-{
-	/* Accessing MESSAGE */
-	switch (name_)
-	{
-	case C1_MINUS:
-                decBrightness();
-                Serial.print("Dimming light down to ");
-                Serial.println(lightDimValue);
-                dimLight(lightDimValue);
-
-                if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
-                  Serial.print("Dimming light down done on ");
-                  Serial.println(lightDimValue);
-                  lightDimValue = 0;
-                  IN_.LightSwitchDimReply(C3_IS_OFF);
-                }
-                
-                break;
-	case C1_PLUS:
-                incBrightness();
-                Serial.print("Dimming light up to ");
-                Serial.println(lightDimValue);
-                dimLight(lightDimValue);
-
-                if(lightDimValue >= LIGHT_ON_STANDARD_VALUE){
-                  Serial.print("Dimming light up done on ");
-                  Serial.println(lightDimValue);
-                  IN_.LightSwitchDimReply(C3_IS_ON);
-                }		
-                break;
-	case C1_PLUS_DIRECT_ON:
-                incBrightness();
-                Serial.print("Dimming light direct up to ");
-                Serial.println(lightDimValue);
-                dimLight(lightDimValue);
-                  IN_.LightSwitchDimReply(C3_IS_ON);
-
-                if(lightDimValue >= LIGHT_ON_MIN_VISIBLE_VALUE){
-                  Serial.print("Dimming light direct up done on ");
-                  Serial.println(lightDimValue);
-                  IN_.LightSwitchDimReply(C3_IS_ON);
-                }
-		break;
-	default: 
-		break;
-	}
-}
-
 void uCHAN_AmbientDimAction (unsigned char name_)
 {
 	/* Accessing MESSAGE */
@@ -734,7 +470,9 @@ void uCHAN_SoundActions (unsigned char name_)
                   IN_.SoundControlEvents(C12_IS_ON);                
                 }
 		break;
-	case C1_PLUS_DIRECT_ON:
+	case C11_PLUS_STEP:
+		incLoudness();
+		incLoudness();
 		incLoudness();
                 Serial.print("Sound Direct + ");
                 Serial.println(thevol);
@@ -744,33 +482,82 @@ void uCHAN_SoundActions (unsigned char name_)
 		break;
 	default: 
 		break;
-	}
+	}  
 }
 
-
-/*
-void uCHAN_LightDimPlusActions (unsigned char name_)
+void uCHAN_LightControllerActions (unsigned char name_)
 {
+	/* Accessing MESSAGE */
 	switch (name_)
 	{
-	case C7_PLUS:
-                if(lightDimValue >= LIGHT_ON_MAX_VALUE){
-                  lightDimValue = LIGHT_ON_MAX_VALUE;
-                  Serial.print("Dimming light plus done on ");
+  	case C14_MINUS:
+               decBrightness();
+                Serial.print("Dimming light down to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
+                  Serial.print("Dimming light down done on ");
                   Serial.println(lightDimValue);
-                }else{
-                  Serial.print("Dimming light plus to ");
+                  IN_.LightControllerEvents(C13_IS_OFF);
+                }
+                
+		break;
+	case C14_MINUS_STEP:
+               decManualBrightness();
+                Serial.print("Dimming light down to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue <= LIGHT_OFF_STANDARD_VALUE){
+                  Serial.print("Dimming light down done on ");
                   Serial.println(lightDimValue);
-                  incBrightness();
-                  dimLight(lightDimValue);
+                  IN_.LightControllerEvents(C13_IS_OFF);
+                }
+		break;
+	case C14_PLUS:
+                incBrightness();
+                Serial.print("Dimming light up to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue >= LIGHT_ON_STANDARD_VALUE){
+                  Serial.print("Dimming light up done on ");
+                  Serial.println(lightDimValue);
+                  IN_.LightControllerEvents(C13_IS_ON);
+                }		
+		break;
+	case C14_PLUS_STEP:
+                incManualBrightness();
+                Serial.print("Dimming light up to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+
+                if(lightDimValue >= LIGHT_ON_STANDARD_VALUE){
+                  Serial.print("Dimming light up done on ");
+                  Serial.println(lightDimValue);
+                  IN_.LightControllerEvents(C13_IS_ON);
+                }		
+		break;
+	case C14_PLUS_STEP_DIRECT:
+                incBrightness();
+                Serial.print("Dimming light direct up to ");
+                Serial.println(lightDimValue);
+                dimLight(lightDimValue);
+                  IN_.LightControllerEvents(C13_IS_ON);
+
+                if(lightDimValue >= LIGHT_ON_MIN_VISIBLE_VALUE){
+                  Serial.print("Dimming light direct up done on ");
+                  Serial.println(lightDimValue);
+                  IN_.LightControllerEvents(C13_IS_ON);
                 }
 		break;
 	default: 
 		break;
 	}
+  
 }
-*/
-//IN_.AmbientDimEvent(name_AmbientDimEvent);
+
 
 /*********************************************************************
 	User defined Output Channel Interface Initialization Function
@@ -786,9 +573,8 @@ void iCHAN_(void)
 
 		/* Initializing Output Interface */
 	OUT_.AmbientDimAction = uCHAN_AmbientDimAction;
-	OUT_.LightSwitchAction = uCHAN_LightSwitchAction;
+	OUT_.LightControllerActions = uCHAN_LightControllerActions;
 	OUT_.SoundActions = uCHAN_SoundActions;
-
 }
 
   
