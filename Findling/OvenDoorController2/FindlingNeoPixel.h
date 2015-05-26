@@ -17,6 +17,7 @@ class FindlingNeoPixel
         int i_blueEnd);
     void turnOn();
     void turnOff();
+    void off();
     void update();
     void printState();
   private:
