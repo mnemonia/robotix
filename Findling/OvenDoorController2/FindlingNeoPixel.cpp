@@ -10,7 +10,7 @@ FindlingNeoPixel::FindlingNeoPixel(
   int i_blueStart,
   int i_blueEnd)
 //: pixels(Adafruit_NeoPixel(1, pin, NEO_GRB + NEO_KHZ800))
-  : pixels(1, 7, NEO_GRB + NEO_KHZ800)
+  : pixels(1, pin, NEO_GRB + NEO_KHZ800)
 {
   pinMode(pin, OUTPUT);
   _pin = pin;
