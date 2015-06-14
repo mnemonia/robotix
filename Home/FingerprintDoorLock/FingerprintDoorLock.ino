@@ -22,14 +22,20 @@
  #include <NewSoftSerial.h>
 #endif
 
+#define DOOR_LOCK_PIN 9
+#define FINGERPRINT_SENSOR_PIN 12
+#define FINGERPRINT_SENSOR_GREEN 2
+#define FINGERPRINT_SENSOR_WHITE 3
+#define LED_PIN 13
+
 int getFingerprintIDez();
 
 // pin #2 is IN from sensor (GREEN wire)
 // pin #3 is OUT from arduino  (WHITE wire)
 #if ARDUINO >= 100
-SoftwareSerial mySerial(2, 3);
+SoftwareSerial mySerial(FINGERPRINT_SENSOR_GREEN, FINGERPRINT_SENSOR_WHITE);
 #else
-NewSoftSerial mySerial(2, 3);
+NewSoftSerial mySerial(FINGERPRINT_SENSOR_GREEN, FINGERPRINT_SENSOR_WHITE);
 #endif
 
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
@@ -37,31 +43,63 @@ Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 void setup()  
 {
   Serial.begin(9600);
-  Serial.println("fingertest");
+  Serial.println("findl.ing door lock");
 
+  pinMode(DOOR_LOCK_PIN, OUTPUT);
+  pinMode(FINGERPRINT_SENSOR_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  testOpenCloseDoor();
+  turnOnFingerprintSensor();
+
+  Serial.println("findl.ing door lock READY");
+}
+
+void turnOnFingerprintSensor(){
+  Serial.print("Turning on fingerprint sensor ...");
+  startFingerprintsensor();  
+  delay(200);
   // set the data rate for the sensor serial port
   finger.begin(57600);
-  
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  
-  digitalWrite(8,HIGH);
-  digitalWrite(9,HIGH);
-  digitalWrite(10,HIGH);
-
-delay(2000);
-  digitalWrite(8,LOW);
-  digitalWrite(9,LOW);
-  digitalWrite(10,LOW);
-
   if (finger.verifyPassword()) {
-    Serial.println("Found fingerprint sensor!");
+    Serial.print("Turning on fingerprint sensor SUCCESS");
   } else {
-    Serial.println("Did not find fingerprint sensor :(");
-    while (1);
+    Serial.print("Turning on fingerprint sensor FAIL. Sensor not found.");
+    stopFingerprintsensor();
+    showAlarmForever();  
   }
-  Serial.println("Waiting for valid finger...");
+}
+
+void testOpenCloseDoor(){
+  openDoor();
+  delay(2000);
+  closeDoor();
+}
+
+void showAlarmForever(){
+    Serial.print("findl.ing door lock FAIL. Alarm: Service out-of-order.");
+    while (1){
+      digitalWrite(LED_PIN,HIGH);
+      delay(100);
+      digitalWrite(LED_PIN,LOW);
+      delay(100);
+    }
+}
+
+void openDoor(){
+  digitalWrite(LED_PIN,HIGH);
+  digitalWrite(DOOR_LOCK_PIN,HIGH);
+  Serial.println("findl.ing door lock OPEN");
+}
+void closeDoor(){
+  digitalWrite(LED_PIN,LOW);
+  digitalWrite(DOOR_LOCK_PIN,LOW);
+}
+void startFingerprintsensor(){
+  digitalWrite(FINGERPRINT_SENSOR_PIN,HIGH);
+}
+void stopFingerprintsensor(){
+  digitalWrite(FINGERPRINT_SENSOR_PIN,LOW);
 }
 
 void loop()                     // run over and over again
@@ -69,14 +107,12 @@ void loop()                     // run over and over again
   int identified = getFingerprintIDez();
   switch(identified){
     case -1:
-      digitalWrite(8,LOW);
-      digitalWrite(9,HIGH);
-//      digitalWrite(10,LOW);
+      closeDoor();
+      delay(50);
       break;
     default:
-      digitalWrite(8,HIGH);
-      digitalWrite(9,LOW);
-//      digitalWrite(10,LOW);    
+      openDoor();
+      delay(1000);
   }
 }
 
@@ -88,16 +124,16 @@ uint8_t getFingerprintID() {
       break;
     case FINGERPRINT_NOFINGER:
       Serial.println("No finger detected");
-      return p;
+      return -1;
     case FINGERPRINT_PACKETRECIEVEERR:
       Serial.println("Communication error");
-      return p;
+      return -1;
     case FINGERPRINT_IMAGEFAIL:
       Serial.println("Imaging error");
-      return p;
-    default:
-      Serial.println("Unknown error");
-      return p;
+      return -1;
+//    default:
+//      Serial.println("Unknown error");
+//      return p;
   }
 
   // OK success!
@@ -109,39 +145,39 @@ uint8_t getFingerprintID() {
       break;
     case FINGERPRINT_IMAGEMESS:
       Serial.println("Image too messy");
-      return p;
+      return -1;
     case FINGERPRINT_PACKETRECIEVEERR:
       Serial.println("Communication error");
-      return p;
+      return -1;
     case FINGERPRINT_FEATUREFAIL:
       Serial.println("Could not find fingerprint features");
-      return p;
+      return -1;
     case FINGERPRINT_INVALIDIMAGE:
       Serial.println("Could not find fingerprint features");
-      return p;
-    default:
-      Serial.println("Unknown error");
-      return p;
+      return -1;
+//    default:
+//      Serial.println("Unknown error");
+//      return p;
   }
   
   // OK converted!
   p = finger.fingerFastSearch();
-  if (p == FINGERPRINT_OK) {
-    Serial.println("Found a print match!");
-  } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
-    Serial.println("Communication error");
-    return p;
-  } else if (p == FINGERPRINT_NOTFOUND) {
-    Serial.println("Did not find a match");
-    return p;
-  } else {
-    Serial.println("Unknown error");
-    return p;
-  }   
-  
+  switch(p){
+    case FINGERPRINT_OK:
+      Serial.println("Found a print match!");
+      break;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Communication error");
+      return -1;
+    case FINGERPRINT_NOTFOUND:
+      Serial.println("Did not find a match");
+      return -1;
+  }
+
   // found a match!
   Serial.print("Found ID #"); Serial.print(finger.fingerID); 
   Serial.print(" with confidence of "); Serial.println(finger.confidence); 
+  return finger.fingerID;
 }
 
 // returns -1 if failed, otherwise returns ID #
