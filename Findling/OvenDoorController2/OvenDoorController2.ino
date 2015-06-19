@@ -2,9 +2,9 @@
 #include <Adafruit_NeoPixel.h>
 #include "FindlingDoorController.h"
 
-FindlingDoorController door_01 = FindlingDoorController(5, 3, 0, 255, 255, 0, 26, 0);
-FindlingDoorController door_02 = FindlingDoorController(8, 6, 0, 255, 255, 0, 26, 0);
-FindlingDoorController door_03 = FindlingDoorController(11, 9, 0, 255, 255, 0, 26, 0);
+FindlingDoorController door_01 = FindlingDoorController(11, 9, 255, 255, 10, 171, 10, 0);
+FindlingDoorController door_02 = FindlingDoorController(8, 6, 0, 196, 255, 255, 19, 0);
+FindlingDoorController door_03 = FindlingDoorController(5, 3, 0, 134, 85, 115, 255, 255);
 
 void setup() {
   Serial.begin(9600);

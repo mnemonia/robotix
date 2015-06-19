@@ -1,5 +1,7 @@
 #include "FindlingNeoPixel.h"
 
+#define TURNING_ON_INCREMENT 4
+#define TURNING_OFF_DECREMENT 8
 
 FindlingNeoPixel::FindlingNeoPixel(
   int pin,
@@ -10,7 +12,7 @@ FindlingNeoPixel::FindlingNeoPixel(
   int i_blueStart,
   int i_blueEnd)
 //: pixels(Adafruit_NeoPixel(1, pin, NEO_GRB + NEO_KHZ800))
-  : pixels(1, pin, NEO_GRB + NEO_KHZ800)
+  : pixels(1, pin, NEO_RGB + NEO_KHZ800)
 {
   pinMode(pin, OUTPUT);
   _pin = pin;
@@ -60,7 +62,7 @@ void FindlingNeoPixel::update()
     isTurningOn = false;
     t = 100;
   }
-  if (isTurningOff && (t == 0)) {
+  if (isTurningOff && (t <= 0)) {
     isTurningOff = false;
     isOff = true;
     t = 0;
@@ -76,7 +78,7 @@ void FindlingNeoPixel::update()
     pixels.setPixelColor(0, pixels.Color(r, g, b));
     pixels.show(); // This sends the updated pixel color to the hardware.
     previousMillis = currentMillis;   // Remember the time
-    t++;
+    t += TURNING_ON_INCREMENT;
   }
   if (isTurningOff && (currentMillis - previousMillis >= ioTime)) {
     int r = nextColor(redStart, redEnd, t);
@@ -86,7 +88,7 @@ void FindlingNeoPixel::update()
     pixels.setPixelColor(0, pixels.Color(r, g, b));
     pixels.show(); // This sends the updated pixel color to the hardware.
     previousMillis = currentMillis;   // Remember the time
-    t--;
+    t -= TURNING_OFF_DECREMENT;
   }
 
 }
