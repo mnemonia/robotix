@@ -1,32 +1,4 @@
-/*
- Debounce
-
- Each time the input pin goes from LOW to HIGH (e.g. because of a push-button
- press), the output pin is toggled from LOW to HIGH or HIGH to LOW.  There's
- a minimum delay between toggles to debounce the circuit (i.e. to ignore
- noise).
-
- The circuit:
- * LED attached from pin 13 to ground
- * pushbutton attached from pin 2 to +5V
- * 10K resistor attached from pin 2 to ground
-
- * Note: On most Arduino boards, there is already an LED on the board
- connected to pin 13, so you don't need any extra components for this example.
-
-
- created 21 November 2006
- by David A. Mellis
- modified 30 Aug 2011
- by Limor Fried
- modified 28 Dec 2012
- by Mike Walters
-
- This example code is in the public domain.
-
- http://www.arduino.cc/en/Tutorial/Debounce
- */
-#define SMOOTHSTEP(x) ((x) * (x) * (3 - 2 * (x)))
+#include <CapacitiveSensor.h>
 
 // constants won't change. They're used here to
 // set pin numbers:
@@ -44,32 +16,7 @@ bool isChanged = false;
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
-int currentDimStep = 0;
-int v;
-int N = 21;
-int A = 0;
-int B = 254;
-int X;
-
-void dimUp() {
-  for (currentDimStep = 0; currentDimStep < N; currentDimStep++) {
-    v = currentDimStep / N;
-    v = SMOOTHSTEP(v);
-    X = (A * v) + (B * (1 - v));
-    analogWrite( ledPin, X);
-    delay(15);
-  }
-}
-
-void dimDown() {
-  for (currentDimStep = currentDimStep; currentDimStep > 0; currentDimStep--) {
-    v = currentDimStep / N;
-    v = SMOOTHSTEP(v);
-    X = (B * v) + (A * (1 - v));
-    analogWrite( ledPin, X);
-    delay(15);
-  }
-}
+CapacitiveSensor   cs_4_2 = CapacitiveSensor(4,2);        // 10M resistor between pins 4 & 2, pin 2 is sensor pin, add a wire and or foil if desired
 
 
 void setup() {
@@ -88,7 +35,10 @@ void blinkLeds() {
   delay(100);
   analogWrite(ledPin, 0);
 }
-void loop() {
+void loop(){
+  
+}
+void loop1() {
   // read the state of the switch into a local variable:
   int reading = digitalRead(buttonPin);
 
