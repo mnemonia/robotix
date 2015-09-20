@@ -2,10 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DoorBellService
 Bundle-SymbolicName: DoorBellService
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0
 Bundle-Activator: ch.mnemonia.house.automation.service.bell.internal.Activator
 Import-Package: ch.mnemonia.service.time,
- com.mnemonia.io,
  javax.sound.sampled,
  org.osgi.framework,
  org.osgi.service.log;version="1.3.0",

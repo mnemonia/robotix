@@ -13,4 +13,5 @@ Bundle-ClassPath: META-INF/lib/pi4j-core.jar,
  META-INF/lib/pi4j-gpio-extension.jar,
  META-INF/lib/pi4j-service.jar,
  .
-Export-Package: com.mnemonia.io
+Export-Package: com.mnemonia.io,
+ com.pi4j.io.gpio.service

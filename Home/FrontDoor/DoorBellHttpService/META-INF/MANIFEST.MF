@@ -2,12 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DoorBellHttpService
 Bundle-SymbolicName: DoorBellHttpService
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0
 Bundle-Activator: ch.mnemonia.home.automation.service.frontdoor.bell.http.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: ch.mnemonia.house.automation.service.bell,
- com.netstal.automation.jettyEmbedded,
  javax.servlet,
  javax.servlet.http,
- org.osgi.framework
+ org.osgi.framework,
+ org.osgi.service.http,
+ org.osgi.util.tracker
