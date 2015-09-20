@@ -25,8 +25,8 @@ public class Activator implements BundleActivator {
         // HTTP service is available, register our servlet...
         HttpService httpService = (HttpService) this.context.getService(reference);
         try {
-          httpService.registerServlet("/", new HttpDoorBellService(), null, null);
-          httpService.registerResources("file:///c:/temp", "/temp", null);
+          httpService.registerServlet("/FrontDoor", new HttpDoorBellService(), null, null);
+//          httpService.registerResources("file:///c:/temp", "/temp", null);
         } catch (Exception exception) {
           exception.printStackTrace();
         }
