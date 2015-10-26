@@ -8,10 +8,18 @@ Adafruit_MPR121 cap = Adafruit_MPR121();
 // so we know when buttons are 'released'
 uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
-
+uint16_t currstate = 0;
+uint8_t touchThreshold = 2;//12;
+uint8_t releaseThreshold = 6;
 bool isOn = false;
 
 int ledPin = 9;    // LED connected to digital pin 9
+
+// the following variables are long's because the time, measured in miliseconds,
+// will quickly become a bigger number than can be stored in an int.
+long lastDebounceTime = 0;  // the last time the output pin was toggled
+long debounceDelay = 50;    // the debounce time; increase if the output flickers
+
 
 void blinkLeds() {
   analogWrite(ledPin, 100);
@@ -39,7 +47,9 @@ void setup() {
     while (1);
   }
   Serial.println("MPR121 found!");
-
+  cap.setThreshholds(touchThreshold, releaseThreshold);
+  Serial.println("MPR121 thresholds set");
+  
   blinkLeds();
 }
 
@@ -66,9 +76,56 @@ void lightsOff(){
 }
 
 void loop() {
+  currtouched = cap.touched();
+  currtouched = currtouched & _BV(0);
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH),  and you've waited
+  // long enough since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (currtouched != lasttouched) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer
+    // than the debounce delay, so take it as the actual current state:
+
+    if (currtouched) {
+      Serial.print("touched and set ");
+      Serial.println(isOn);
+      if(!isOn){
+        lightsOn();
+        isOn = true;
+      }else{
+        lightsOff();
+        isOn = false;
+      }
+    }
+  }
+lasttouched = currtouched;
+delay(25);
+}
+
+void loopOld() {
   // Get the currently touched pads
   currtouched = cap.touched();
-  
+  if ((currtouched & _BV(0))) {
+    Serial.print("touched and set ");
+    Serial.println(isOn);
+    if(!isOn){
+      lightsOn();
+      isOn = true;
+    }else{
+      lightsOff();
+      isOn = false;
+    }
+  }
+  // 50ms delay to fix on/off bug of sensor.
+  delay(150);
+  return;
+    
   for (uint8_t i=0; i<1; i++) {
     // it if *is* touched and *wasnt* touched before, alert!
     if ((currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) {
@@ -90,6 +147,8 @@ void loop() {
   // reset our state
   lasttouched = currtouched;
 
+  // 50ms delay to fix on/off bug of sensor.
+  delay(150);
   // comment out this line for detailed data from the sensor!
   return;
   
