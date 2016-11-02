@@ -1,14 +1,16 @@
 #include "Knob.h"
 #include "Signal.h"
 
-Knob knob(8);
-Signal theSignal(2);
+Knob knob(A7);
+Signal theSignal(13);
 
-void setup() {;}
+void setup() {
+  Serial.begin(9600);
+  }
 
 void loop() {
   if(knob.isDown()){
-    theSignal.sendSignal(500);
+    theSignal.sendSignal(1500);
   }
   delay(25);
 }

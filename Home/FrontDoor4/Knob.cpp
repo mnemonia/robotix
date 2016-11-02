@@ -7,5 +7,6 @@ Knob::Knob(int pin){
 };
 
 boolean Knob::isDown(){
-  return digitalRead(_pin) == LOW;
+  Serial.println(digitalRead(A7));
+  return digitalRead(A7) == LOW;
 };

@@ -18,7 +18,7 @@ int ledPin = 9;    // LED connected to digital pin 9
 // the following variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
 long lastDebounceTime = 0;  // the last time the output pin was toggled
-long debounceDelay = 50;    // the debounce time; increase if the output flickers
+long debounceDelay = 100;    // the debounce time; increase if the output flickers
 
 
 void blinkLeds() {

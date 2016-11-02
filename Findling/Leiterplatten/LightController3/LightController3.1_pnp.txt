@@ -1,0 +1,46 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=LightController3.1
+*Date=21:21:30
+*CreatedBy=Fritzing 0.9.2b.11.19.8d2d5970658f0bed09c661c9ea9a515b5f40f44c
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;TO220 [THT];37.9307;-18.5416;90;Bottom;LED2
+2;;THT;6.05838;-45.9031;0;Bottom;CAP4
+3;;cap-pth-small2;33.3022;-45.2116;-90;Bottom;C2
+4;;;17.9832;-14.3384;0;Bottom;Via6
+5;10k;THT;33.3022;-31.712;90;Bottom;LED1
+6;;THT;44.0831;-29.8446;180;Bottom;LED1
+7;;THT;6.05838;-33.2971;0;Bottom;CAP2
+8;;THT;6.05838;-5.63935;0;Bottom;LDR1
+9;;;2.74319;-7.02319;0;Bottom;Via1
+10;;THT;44.0831;-4.44462;180;Bottom;LED3
+11;;;11.2776;-26.5304;0;Bottom;Via4
+12;10k;THT;12.7941;-19.4824;-90;Bottom;LDR3
+13;;;3.35279;-5.19439;0;Bottom;Via5
+14;10k;THT;10.2541;-13.4616;-90;Bottom;LDR2
+15;10k;THT;33.3022;-6.78235;90;Bottom;LED3
+16;;;26.5176;-23.4824;0;Bottom;Via8
+17;10k;THT;33.3022;-19.2001;90;Bottom;LED2
+18;;THT;6.05838;-26.9942;0;Bottom;CAP1
+19;;THT;44.1772;-45.0846;180;Bottom;MAIN
+20;;;12.4968;-22.2632;0;Bottom;Via3
+21;;TO220 [THT];37.9307;-31.2416;90;Bottom;LED1
+22;;THT;6.05838;-18.8097;0;Bottom;LDR3
+23;;cpol-radial-100uf-25v;37.6296;-45.2116;90;Bottom;C1
+24;;THT;6.05838;-39.6001;0;Bottom;CAP3
+25;;TO220 [THT];37.9307;-5.84162;90;Bottom;LED3
+26;;;24.6888;-17.996;0;Bottom;Via7
+27;10k;THT;12.7941;-6.78235;90;Bottom;LDR1
+28;;THT;44.0831;-17.1446;180;Bottom;LED2
+29;;;23.1422;-26.1531;0;Bottom;findl.ing.gl LC.1
+30;;;13.1064;-9.46159;0;Bottom;Via2
+31;;THT;6.05838;-12.3186;0;Bottom;LDR2

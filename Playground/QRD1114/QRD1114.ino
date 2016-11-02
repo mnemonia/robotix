@@ -28,7 +28,7 @@
  */
 
 int sensorPin = A0;    // select the input pin for the potentiometer
-int ledPin = 13;      // select the pin for the LED
+int ledPin = 12;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 void setup() {
@@ -41,4 +41,20 @@ void loop() {
   // read the value from the sensor:
   sensorValue = analogRead(sensorPin);    
   Serial.println(sensorValue);
+
+  if(sensorValue < 300){
+    lampeEin();  
+  }else{
+    lampeAus();
+  }
 }
+
+
+void lampeEin(){
+  digitalWrite(12, HIGH);  
+}
+
+void lampeAus(){
+  digitalWrite(12, LOW);  
+}
+

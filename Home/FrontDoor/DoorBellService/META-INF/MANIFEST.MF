@@ -10,7 +10,7 @@ Import-Package: ch.mnemonia.service.time,
  org.osgi.service.log;version="1.3.0",
  org.osgi.util.tracker;version="1.5.1"
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: META-INF/lib/jl1.0.1.jar,
- .
+Bundle-ClassPath: .,
+ src/main/resources/jl1.0.1.jar
 Export-Package: ch.mnemonia.house.automation.service.bell
 Require-Bundle: org.junit;resolution:=optional
